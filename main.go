@@ -61,9 +61,8 @@ func main() {
 
 const (
 	rcOk           = 0
-	rcWarning      = 1
-	rcCmdLineError = 2
-	rcProcessError = 3
+	rcCmdLineError = 1
+	rcProcessError = 2
 )
 
 const maxNGram = 50
