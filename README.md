@@ -53,18 +53,18 @@ The resulting output file has three columns:
 For n-gram counting the [character encoding](https://en.wikipedia.org/wiki/Character_encoding) of the source file must be known.
 It can any of the following values:
 
-| Name        | Meaning           |
-|-------------|-------------------|
-| `cp437`     | IBM Code Page 437 |
-| `cp850`     | IBM Code Page 850 |
-| `cp852`     | IBM Code Page 852 |
-| `iso88591`  | ISO 8859-1        |
-| `iso885915` | ISO 8859-15       |
-| `utf16be`   | UTF-16BE          |
-| `utf16le`   | UTF-16LE          |
-| `utf8`      | UTF-8             |
-| `win1250`   | Windows 1250      |
-| `win1252`   | Windows 1252      |
+| Name        | Meaning                                                          |
+|-------------|------------------------------------------------------------------|
+| `cp437`     | [IBM Code Page 437](https://en.wikipedia.org/wiki/Code_page_437) |
+| `cp850`     | [IBM Code Page 850](https://en.wikipedia.org/wiki/Code_page_850) |
+| `cp852`     | [IBM Code Page 852](https://en.wikipedia.org/wiki/Code_page_852) |
+| `iso88591`  | [ISO 8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1)       |
+| `iso885915` | [ISO 8859-15](https://en.wikipedia.org/wiki/ISO/IEC_8859-15)     |
+| `utf16be`   | [UTF-16BE](https://en.wikipedia.org/wiki/UTF-16)                 |
+| `utf16le`   | [UTF-16LE](https://en.wikipedia.org/wiki/UTF-16)                 |
+| `utf8`      | [UTF-8](https://en.wikipedia.org/wiki/UTF-8)                     |
+| `win1250`   | [Windows 1250](https://en.wikipedia.org/wiki/Windows-1250)       |
+| `win1252`   | [Windows 1252](https://en.wikipedia.org/wiki/Windows-1252)       |
 
 `utf16` can be used as a synonym for `utf16be`.
 
