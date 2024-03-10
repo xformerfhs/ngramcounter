@@ -42,7 +42,6 @@ import (
 
 // NgramCounter contains the encoding data for an NgramCounter.
 type NgramCounter struct {
-	enc     encoding.Encoding
 	decoder *encoding.Decoder
 }
 
@@ -50,7 +49,7 @@ type NgramCounter struct {
 
 // NewNgramCounter returns a new NGramCounter for the given encoding text.
 func NewNgramCounter(enc encoding.Encoding) *NgramCounter {
-	return &NgramCounter{enc: enc, decoder: enc.NewDecoder()}
+	return &NgramCounter{decoder: enc.NewDecoder()}
 }
 
 // CountNGrams counts the n-grams in the file.
