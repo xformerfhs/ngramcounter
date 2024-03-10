@@ -61,7 +61,7 @@ func CountBytes(fileName string) (map[string]uint64, uint64, error) {
 	byteCounter := make(map[string]uint64, 256)
 
 	if byteHexTable == nil {
-		byteHexTable = buildByteTable()
+		byteHexTable = buildByteHexTableTable()
 	}
 
 	for {
@@ -85,8 +85,8 @@ func CountBytes(fileName string) (map[string]uint64, uint64, error) {
 
 // ******** Private functions ********
 
-// buildByteTable builds the index to hexdecimal representation table.
-func buildByteTable() []string {
+// buildByteHexTableTable builds the index to hexadecimal representation table.
+func buildByteHexTableTable() []string {
 	result := make([]string, 256)
 
 	for i := 0; i < 256; i++ {

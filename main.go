@@ -218,8 +218,21 @@ func makeWriteError(fileName string, err error) error {
 
 // printUsage prints the usage text
 func printUsage() {
-	fmt.Printf("\nUsage of %s:\n", myName)
+	fmt.Println(`A program to count bytes or n-grams in files
+
+Usage:`)
+
+	_, _ = fmt.Fprintf(os.Stderr, "\n%s [-ngram count] [-encoding encoding] [-separator char] [files...]\n\nwith the following options:\n\n",
+		myName)
 	flag.PrintDefaults()
+
+	_, _ = fmt.Fprintf(os.Stderr, `
+followed by a list of file names.
+
+The results are written to 'filename.csv', i.e. the filename with '.csv' appended.
+
+The format is a 'character separated value' file which can be imported e.g. by Excel.
+`)
 
 	_, _ = fmt.Fprintln(os.Stderr, "\n'encoding' can be one of the following values of the first column:")
 	for _, e := range encodinghelper.EncodingTextList() {
