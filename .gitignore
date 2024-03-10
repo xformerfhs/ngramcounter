@@ -1,0 +1,7 @@
+.idea
+ngramcounter*
+
+*.zip
+*.zipx
+*.json
+*.exe
