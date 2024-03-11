@@ -72,7 +72,7 @@ func fillEncodingMap() {
 		cm, isCm := enc.(*charmap.Charmap)
 		if isCm {
 			charMapName := cm.String()
-			textToEncoding[normalizeEncoding(charMapName)] = encodingInfo{charMapName, cm}
+			textToEncoding[normalizeEncoding(charMapName)] = encodingInfo{name: charMapName, encoding: enc}
 		}
 	}
 }
