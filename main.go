@@ -238,7 +238,7 @@ The format is a 'character separated value' file which can be imported e.g. by E
 		_, _ = fmt.Fprint(os.Stderr, `  `)
 		_, _ = fmt.Fprintln(os.Stderr, e)
 	}
-	_, _ = fmt.Fprintln(os.Stderr, "\n  'utf16' may be used as a synonym for 'utf16be'")
+	_, _ = fmt.Fprintln(os.Stderr, "\n  'utf16' may be used as a synonym for 'utf16le'")
 
 	_, _ = fmt.Fprintln(os.Stderr)
 }

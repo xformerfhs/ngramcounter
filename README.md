@@ -66,7 +66,7 @@ It can any of the following values:
 | `win1250`   | [Windows 1250](https://en.wikipedia.org/wiki/Windows-1250)       |
 | `win1252`   | [Windows 1252](https://en.wikipedia.org/wiki/Windows-1252)       |
 
-`utf16` can be used as a synonym for `utf16be`.
+`utf16` can be used as a synonym for `utf16le`.
 
 On Windows systems files a normally `Windows 1252` encoded.
 Linux systems normally use `UTF-8`.

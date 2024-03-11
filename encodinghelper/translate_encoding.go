@@ -93,9 +93,9 @@ func cleanEncodingText(charEncoding string) string {
 
 	resultString := result.String()
 
-	// utf16 has to be mapped to utf16be.
+	// utf16 has to be mapped to utf16le, as this is the default UTF-16 encoding on Windows.
 	if resultString == `utf16` {
-		resultString = `utf16be`
+		resultString = `utf16le`
 	}
 
 	return resultString
