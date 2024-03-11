@@ -51,15 +51,28 @@ var utf16BeEncoding = unicode.UTF16(unicode.BigEndian, unicode.UseBOM)
 var utf16LeEncoding = unicode.UTF16(unicode.LittleEndian, unicode.UseBOM)
 
 // textToEncoding maps an encoding specification to the corresponding encoding information.
-var textToEncoding = map[string]encodingInfo{
-	`cp437`:     {name: charmap.CodePage437.String(), encoding: charmap.CodePage437},
-	`cp850`:     {name: charmap.CodePage850.String(), encoding: charmap.CodePage850},
-	`cp852`:     {name: charmap.CodePage852.String(), encoding: charmap.CodePage852},
-	`iso88591`:  {name: charmap.ISO8859_1.String(), encoding: charmap.ISO8859_1},
-	`iso885915`: {name: charmap.ISO8859_15.String(), encoding: charmap.ISO8859_15},
-	`utf16be`:   {name: `UTF-16BE`, encoding: utf16BeEncoding},
-	`utf16le`:   {name: `UTF-16LE`, encoding: utf16LeEncoding},
-	`utf8`:      {name: `UTF-8`, encoding: unicode.UTF8BOM},
-	`win1250`:   {name: charmap.Windows1250.String(), encoding: charmap.Windows1250},
-	`win1252`:   {name: charmap.Windows1252.String(), encoding: charmap.Windows1252},
+var textToEncoding = map[string]encodingInfo{}
+
+// ******** Public functions *********
+
+// InitializeEncoding initializes encoding variables.
+func InitializeEncoding() {
+	fillEncodingMap()
+}
+
+// ******** Private functions *********
+
+// fillEncdingMap fills the encoding map.
+func fillEncodingMap() {
+	textToEncoding[`utf8`] = encodingInfo{name: `UTF-8`, encoding: unicode.UTF8BOM}
+	textToEncoding[`utf16be`] = encodingInfo{name: `UTF-16BE`, encoding: utf16BeEncoding}
+	textToEncoding[`utf16le`] = encodingInfo{name: `UTF-16LE`, encoding: utf16LeEncoding}
+
+	for _, enc := range charmap.All {
+		cm, isCm := enc.(*charmap.Charmap)
+		if isCm {
+			charMapName := cm.String()
+			textToEncoding[normalizeEncoding(charMapName)] = encodingInfo{charMapName, cm}
+		}
+	}
 }

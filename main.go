@@ -69,6 +69,8 @@ const maxNGram = 50
 
 // mainWithReturnCode is the real main function which obeys defers and sets a return code.
 func mainWithReturnCode(args []string) int {
+	encodinghelper.InitializeEncoding()
+
 	var err error
 
 	var ngram uint

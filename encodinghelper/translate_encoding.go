@@ -56,7 +56,7 @@ func EncodingTextList() []string {
 
 	result := make([]string, len(keys))
 	for i, k := range keys {
-		result[i] = fmt.Sprintf(`%-10s: %s`, k, textToEncoding[k].name)
+		result[i] = fmt.Sprintf(`%-13s: %s`, k, textToEncoding[k].name)
 	}
 
 	return result
@@ -69,12 +69,24 @@ func EncodingTextList() []string {
 func normalizeEncoding(charEncoding string) string {
 	normalizedText := cleanEncodingText(charEncoding)
 
-	if strings.HasPrefix(normalizedText, `codepage`) {
-		return strings.Replace(normalizedText, `codepage`, `cp`, 1)
+	if strings.HasPrefix(normalizedText, `ibm`) {
+		normalizedText = normalizedText[3:]
+	}
+
+	if strings.HasPrefix(normalizedText, `macintosh`) {
+		normalizedText = strings.Replace(normalizedText, `macintosh`, `mac`, 1)
+	}
+
+	if strings.Contains(normalizedText, `codepage`) {
+		normalizedText = strings.Replace(normalizedText, `codepage`, `cp`, 1)
 	}
 
 	if strings.HasPrefix(normalizedText, `windows`) {
-		return strings.Replace(normalizedText, `windows`, `win`, 1)
+		normalizedText = strings.Replace(normalizedText, `windows`, `win`, 1)
+	}
+
+	if strings.HasPrefix(normalizedText, `wincp`) {
+		normalizedText = strings.Replace(normalizedText, `wincp`, `cp`, 1)
 	}
 
 	return normalizedText

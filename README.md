@@ -50,8 +50,14 @@ The resulting output file has three columns:
 | Count       | Number of the times the byte or n-gram if found in the file.         |
 | Share       | Share of the byte or n-gram of the total number of bytes or n-grams. |
 
-For n-gram counting the [character encoding](https://en.wikipedia.org/wiki/Character_encoding) of the source file must be known.
-It can any of the following values:
+Text files are just a stream of bytes with no inherent meaning.
+There has to be a mapping between the bytes and the characters.
+I.e., each character is represented by a mapping into a sequence of bytes.
+This is called a [character encoding](https://en.wikipedia.org/wiki/Character_encoding).
+For n-gram counting this encoding needs to be specified.
+This is what the `encoding` option is for.
+
+It can have any of the following values:
 
 | Name        | Meaning                                                          |
 |-------------|------------------------------------------------------------------|
@@ -68,8 +74,14 @@ It can any of the following values:
 
 `utf16` can be used as a synonym for `utf16le`.
 
-On Windows systems files a normally `Windows 1252` encoded.
+On Windows systems files are normally `Windows 1252`-encoded.
+Windows also uses `UTF-16LE` encoding.
+Some files may be `UTF-8`-encoded.
+
 Linux systems normally use `UTF-8`.
+
+There is no way to know what the encoding is.
+It has to be specified by the user.
 
 ## Contact
 
