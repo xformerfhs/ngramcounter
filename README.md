@@ -57,7 +57,8 @@ This is called a [character encoding](https://en.wikipedia.org/wiki/Character_en
 For n-gram counting this encoding needs to be specified.
 This is what the `encoding` option is for.
 
-It can have any of the following values:
+It can have a lot of values that represent all the encodings that Go supports.
+Here are the most important ones:
 
 | Name        | Meaning                                                          |
 |-------------|------------------------------------------------------------------|
