@@ -62,7 +62,7 @@ func InitializeEncoding() {
 
 // ******** Private functions *********
 
-// fillEncdingMap fills the encoding map.
+// fillEncodingMap fills the encoding map.
 func fillEncodingMap() {
 	textToEncoding[`utf8`] = encodingInfo{name: `UTF-8`, encoding: unicode.UTF8BOM}
 	textToEncoding[`utf16be`] = encodingInfo{name: `UTF-16BE`, encoding: utf16BeEncoding}
