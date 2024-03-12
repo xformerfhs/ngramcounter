@@ -166,7 +166,7 @@ func countNGrams(charEncoding string, ngram uint, separator string) error {
 	for _, fileName := range flag.Args() {
 		printCountInfo(fileName)
 
-		// 3. Check if the current file has a byte-order-mark and change counter if it has one.
+		// 3. Check if the current file has a byte-order mark and change counter if it has one.
 		var actNgramCounter *counters.NgramCounter
 		actNgramCounter, err = chooseCounter(fileName, requestedEncoding, requestedNgramCounter)
 
@@ -194,7 +194,7 @@ func chooseCounter(fileName string, requestedEncoding encoding.Encoding, request
 	}
 
 	if probedEncoding != nil && probedEncoding != requestedEncoding {
-		logger.PrintInfof(20, `File '%s' has a %s byte-order-mark and is read with this encoding`, fileName, probedEncodingName)
+		logger.PrintInfof(20, `File '%s' has a %s byte-order mark and is read with this encoding`, fileName, probedEncodingName)
 		return counters.NewNgramCounter(probedEncoding), nil
 	}
 

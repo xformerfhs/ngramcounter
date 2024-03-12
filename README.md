@@ -81,8 +81,15 @@ Some files may be `UTF-8`-encoded.
 
 Linux systems normally use `UTF-8`.
 
-There is no way to know what the encoding is.
+Normally, there is no way to know what the encoding is.
 It has to be specified by the user.
+
+The encoding is only known when the file begins with a "[byte-order mark](https://en.wikipedia.org/wiki/Byte_order_mark)".
+If a file begins with a byte-order mark the corresponding encoding is used, regardless of the value of the `encoding` option.
+The three known byte-order marks are for `UTF-8`, `UTF-16BE` and `UTF-16LE`.
+It is not necessary that a file encoded with these encodings has a byte-order mark. 
+It may or may not be present.
+
 
 ## Contact
 
