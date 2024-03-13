@@ -154,7 +154,7 @@ func countNGrams(charEncoding string, ngram uint, separator string) error {
 	var count map[string]uint64
 	var total uint64
 
-	// 1. Get requested encoding and corresponding n-gRam counter.
+	// 1. Get requested encoding and corresponding n-gram counter.
 	var requestedEncoding encoding.Encoding
 	var requestedEncodingName string
 	requestedEncoding, requestedEncodingName, err = encodinghelper.TranslateEncoding(charEncoding)
