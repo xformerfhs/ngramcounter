@@ -12,7 +12,7 @@ A 2-gram is two adjacent characters.
 And so on.
 
 This utility counts bytes or n-grams in files and writes them into CSV files.
-The CSV stands for 'character separated value'
+The "CSV" stands for 'character separated value'.
 
 ## Call
 
