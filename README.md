@@ -24,15 +24,22 @@ ngramcounter [-ngram count] [-encoding encoding] [-separator char] [files...]
 
 The parts have the following meaning:
 
-| Part        | Meaning                                                                          |
-|-------------|----------------------------------------------------------------------------------|
-| `count`     | Number of characters in an n-gram".                                              |
-| `encoding`  | Character encoding. Can be any of the list below                                 |
-| `separator` | Character used for separating fields in the CSV output. Can be either ',' or ';' |
-| `files`     | List of file names count.                                                        |
+| Part        | Meaning                                                                           |
+|-------------|-----------------------------------------------------------------------------------|
+| `count`     | Number of characters in an n-gram".                                               |
+| `encoding`  | Character encoding. Can be any of the list below.                                 |
+| `separator` | Character used for separating fields in the CSV output. Can be either `,` or `;`. |
+| `files`     | List of file names count.                                                         |
 
 For every file in the file list a file with the name `filename.csv` is written.
 I.e. the file name is appended with `.csv`.
+
+The default for `separator` is `;`.
+This separator implies that the decimal separator is a `,`.
+If `separator` is specified as `,` the decimal separator is `.`.
+
+If no argument is specified a usage message is written.
+This usage message contains a list of all supported encodings.
 
 The possible return codes are the following:
 
@@ -81,13 +88,13 @@ Some files may be `UTF-8`-encoded.
 
 Linux systems normally use `UTF-8`.
 
-Normally, there is no way to know what the encoding is.
+There is no way to know what the encoding is.
 It has to be specified by the user.
 
-The encoding is only known when the file begins with a "[byte-order mark](https://en.wikipedia.org/wiki/Byte_order_mark)".
-If a file begins with a byte-order mark the corresponding encoding is used, regardless of the value of the `encoding` option.
+However, there are a few exceptions to this rule.
+The encoding is known if a file begins with a "[byte-order mark](https://en.wikipedia.org/wiki/Byte_order_mark)".
 The three known byte-order marks are for `UTF-8`, `UTF-16BE` and `UTF-16LE`.
-It is not necessary that a file encoded with these encodings has a byte-order mark. 
+A byte-order mark is not mandatory for files encoded in one of those encodings.
 It may or may not be present.
 
 
