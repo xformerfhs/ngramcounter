@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2024 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2024-2025 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
+//    2025-01-08: V1.0.1: Remove unnecessary arguments in call of realMain.
 //
 
 package main
@@ -54,7 +55,7 @@ func main() {
 	logger.PrintInfof(11, `Begin %s v%s`, myName, myVersion)
 	// Hack, so that we have a way to have args as arguments, set the exit code and run defer functions.
 	// This is a severe design deficiency of Go 1
-	rc := mainWithReturnCode(os.Args[1:])
+	rc := mainWithReturnCode()
 	logger.PrintInfof(12, `End %s v%s`, myName, myVersion)
 	os.Exit(rc)
 }
@@ -68,7 +69,7 @@ const (
 const maxNGram = 50
 
 // mainWithReturnCode is the real main function which obeys defers and sets a return code.
-func mainWithReturnCode(args []string) int {
+func mainWithReturnCode() int {
 	encodinghelper.InitializeEncoding()
 
 	var err error
