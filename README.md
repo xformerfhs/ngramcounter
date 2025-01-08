@@ -29,7 +29,7 @@ The parts have the following meaning:
 | `count`     | Number of characters in an n-gram".                                               |
 | `encoding`  | Character encoding. Can be any of the list below.                                 |
 | `separator` | Character used for separating fields in the CSV output. Can be either `,` or `;`. |
-| `files`     | List of file names count.                                                         |
+| `files`     | List of file names whose contents are to be counted.                              |
 
 For every file in the file list a file with the name `filename.csv` is written.
 I.e. the file name is appended with `.csv`.
