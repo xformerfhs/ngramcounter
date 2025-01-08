@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2024 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2025 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -23,25 +23,19 @@
 // Version: 1.0.0
 //
 // Change history:
-//    2024-03-10: V1.0.0: Created.
+//    2025-01-08: V1.0.0: Created.
 //
 
-package texthelper
+package main
 
 import (
-	"strings"
-	"unicode"
+	"ngramcounter/encodinghelper"
+	"ngramcounter/filehelper"
+	"os"
 )
 
-var compressedLine strings.Builder
-
-func CompressText(line string) string {
-	compressedLine.Reset()
-	for _, r := range line {
-		if !unicode.Is(unicode.Pattern_White_Space, r) {
-			_, _ = compressedLine.WriteRune(r)
-		}
-	}
-
-	return compressedLine.String()
+// init contains calls for the initialization of the package.
+func init() {
+	encodinghelper.InitializeEncoding()
+	myName = filehelper.GetRealBaseName(os.Args[0])
 }

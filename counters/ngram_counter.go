@@ -20,22 +20,25 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 2.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
+//    2025-01-08: V2.0.0: Use different modes, with "overlapped" being the default.
 //
 
 package counters
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
+	"io"
 	"ngramcounter/filehelper"
-	"ngramcounter/texthelper"
 	"os"
+	"unicode"
 )
 
 // ******** Public types *********
@@ -53,7 +56,7 @@ func NewNgramCounter(enc encoding.Encoding) *NgramCounter {
 }
 
 // CountNGrams counts the n-grams in the file.
-func (nc *NgramCounter) CountNGrams(fileName string, n uint) (map[string]uint64, uint64, error) {
+func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequential bool) (map[string]uint64, uint64, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, 0, err
@@ -63,26 +66,49 @@ func (nc *NgramCounter) CountNGrams(fileName string, n uint) (map[string]uint64,
 	// 1. Wrap the file in a transform that decodes the character encoding to UTF-8.
 	tr := transform.NewReader(f, nc.decoder)
 
-	// 2. The scanner uses the transform reader.
-	scanner := bufio.NewScanner(tr)
+	// 2. The buffered reader uses the transform reader.
+	br := bufio.NewReader(tr)
 
 	// 3. Now loop over the lines.
 	result := make(map[string]uint64)
-	collector := make([]rune, n)
+	collector := make([]rune, ngramSize)
+	collectorIndex := uint(0)
 	ngramCounter := uint64(0)
-	ngramCount := ngramCounter
-	for scanner.Scan() {
-		line := scanner.Text()
-		compressedLine := texthelper.CompressText(line)
-		ngramCount, err = scanLineForNGrams(compressedLine, result, collector, n)
+	for {
+		// Read rune and bail out, if there is an error or EOF.
+		var r rune
+		r, _, err = br.ReadRune()
 		if err != nil {
-			return nil, 0, err
+			if errors.Is(err, io.EOF) {
+				break
+			} else {
+				return nil, 0, err
+			}
 		}
-		ngramCounter += ngramCount
+
+		// Only look at letters and numbers.
+		if !unicode.In(r, unicode.L, unicode.N) {
+			continue
+		}
+
+		// Put rune in collector.
+		collector[collectorIndex] = r
+		collectorIndex++
+
+		// Count n-gram, if collector is full.
+		if collectorIndex == ngramSize {
+			ngram := string(collector)
+			result[ngram]++
+			ngramCounter++
+
+			collectorIndex = advanceCollector(collector, collectorIndex, ngramSize, useSequential)
+		}
 	}
 
-	if err = scanner.Err(); err != nil {
-		return nil, 0, err
+	if useSequential && collectorIndex != 0 {
+		return nil,
+			0,
+			fmt.Errorf(`File ends with an incomplete %d-gram: '%s'`, ngramSize, collector[:collectorIndex])
 	}
 
 	return result, ngramCounter, nil
@@ -90,26 +116,16 @@ func (nc *NgramCounter) CountNGrams(fileName string, n uint) (map[string]uint64,
 
 // ******** Private functions ********
 
-// scanLineForNGrams scans a file line and counts the n-grams in it.
-func scanLineForNGrams(line string, counter map[string]uint64, collector []rune, n uint) (uint64, error) {
-	ngramCounter := uint64(0)
-	collectorIndex := uint(0)
-	for _, r := range line {
-		collector[collectorIndex] = r
-		collectorIndex++
-
-		if collectorIndex >= n {
-			ngram := string(collector)
-			counter[ngram]++
-			ngramCounter++
-
-			collectorIndex = 0
+// advanceCollector prepares the collector for the next rune.
+func advanceCollector(collector []rune, collectorIndex uint, ngramSize uint, useSequential bool) uint {
+	if useSequential {
+		collectorIndex = 0
+	} else {
+		for i := 1; i < int(ngramSize); i++ {
+			collector[i-1] = collector[i]
 		}
+		collectorIndex--
 	}
 
-	if collectorIndex != 0 {
-		return 0, fmt.Errorf(`Line ends with an incomplete %d-gram: '%s'`, n, line)
-	}
-
-	return ngramCounter, nil
+	return collectorIndex
 }

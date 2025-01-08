@@ -40,15 +40,10 @@ import (
 // bufferSize is the size of the read buffer.
 const bufferSize = 64 * 1024
 
-// ******** Private variables ********
-
-// byteHexTable contains the hexadecimal representation of its indizes.
-var byteHexTable []string
-
 // ******** Public functions ********
 
 // CountBytes counts how often a byte appears in a file.
-func CountBytes(fileName string) (map[string]uint64, uint64, error) {
+func CountBytes(fileName string) (map[byte]uint64, uint64, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, 0, err
@@ -58,11 +53,7 @@ func CountBytes(fileName string) (map[string]uint64, uint64, error) {
 	buffer := make([]byte, bufferSize)
 
 	total := uint64(0)
-	byteCounter := make(map[string]uint64, 256)
-
-	if byteHexTable == nil {
-		byteHexTable = buildByteHexTableTable()
-	}
+	byteCounter := make(map[byte]uint64, 256)
 
 	for {
 		var n int
@@ -76,40 +67,9 @@ func CountBytes(fileName string) (map[string]uint64, uint64, error) {
 
 		total += uint64(n)
 		for i := 0; i < n; i++ {
-			byteCounter[byteHexTable[buffer[i]]]++
+			byteCounter[buffer[i]]++
 		}
 	}
 
 	return byteCounter, total, nil
-}
-
-// ******** Private functions ********
-
-// buildByteHexTableTable builds the index to hexadecimal representation table.
-func buildByteHexTableTable() []string {
-	result := make([]string, 256)
-
-	for i := 0; i < 256; i++ {
-		result[i] = string(byteAsHex(byte(i)))
-	}
-
-	return result
-}
-
-// hexDigits contains the hexadecimal digits
-var hexDigits = []byte{
-	'0', '1', '2', '3',
-	'4', '5', '6', '7',
-	'8', '9', 'A', 'B',
-	'C', 'D', 'E', 'F',
-}
-
-// hexBuffer contains the two hexadecimal digits as bytes.
-var hexBuffer [2]byte
-
-// byteAsHex converts a byte into a hexadecimal representation.
-func byteAsHex(b byte) []byte {
-	hexBuffer[0] = hexDigits[(b>>4)&0x0f]
-	hexBuffer[1] = hexDigits[b&0x0f]
-	return hexBuffer[:]
 }

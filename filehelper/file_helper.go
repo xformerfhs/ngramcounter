@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 2.0.0
 //
 // Change history:
 //    2024-02-01: V1.0.0: Created.
+//    2025-01-08: V2.0.0: Added PathComponents.
 //
 
 package filehelper
@@ -45,42 +46,18 @@ func CloseFile(file *os.File) {
 	}
 }
 
-// DeleteFile deletes the file specified by the given file path.
-func DeleteFile(filePath string) {
-	err := os.Remove(filePath)
-	if err != nil {
-		printFileOperationError(`delet`, filePath, err)
-	}
-}
-
 // GetRealBaseName gets the base name of a file without the extension.
 func GetRealBaseName(filePath string) string {
 	return strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
 }
 
-// FileSize returns the size of the named file.
-func FileSize(filePath string) (int64, error) {
-	fi, err := os.Stat(filePath)
-	if err != nil {
-		return 0, err
-	}
-
-	return fi.Size(), nil
-}
-
-// IsDir checks if a file path is a directory.
-func IsDir(filePath string) (bool, error) {
-	fileInfo, err := os.Stat(filePath)
-	if err != nil {
-		return false, err
-	}
-
-	return fileInfo.IsDir(), nil
-}
-
-// IsFileName returns "true", if the supplied file path does not contain any path elements.
-func IsFileName(filePath string) bool {
-	return filepath.Base(filePath) == filePath
+// PathComponents returns the directory, base name and extension (with leading '.') of the supplied file path.
+func PathComponents(filePath string) (string, string, string) {
+	dir := filepath.Dir(filePath)
+	base := filepath.Base(filePath)
+	ext := filepath.Ext(filePath)
+	base = strings.TrimSuffix(base, ext)
+	return dir, base, ext
 }
 
 // ******** Private functions ********
