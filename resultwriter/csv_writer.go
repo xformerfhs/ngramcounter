@@ -33,10 +33,12 @@ import (
 	"bytes"
 	"fmt"
 	"ngramcounter/filehelper"
+	"ngramcounter/maphelper"
 	"ngramcounter/platform"
 	"ngramcounter/stringhelper"
 	"os"
 	"path/filepath"
+	"slices"
 )
 
 // ******** Private constants ********
@@ -60,8 +62,11 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 		return ``, err
 	}
 
+	ngramList := maphelper.Keys(counter)
+	slices.Sort(ngramList)
+
 	inverseTotal := 1.0 / float64(total)
-	for ngram, count := range counter {
+	for _, ngram := range ngramList {
 		err = writeNgram(f, ngram)
 		if err != nil {
 			return ``, err
@@ -71,6 +76,8 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 		if err != nil {
 			return ``, err
 		}
+
+		count := counter[ngram]
 
 		_, err = f.WriteString(fmt.Sprint(count))
 		if err != nil {
