@@ -68,7 +68,7 @@ func defineCommandLineFlags() {
 
 	flag.StringVar(&separator, `separator`, `;`, `Output field separator (either ',' or ';')`)
 
-	flag.BoolVar(&useSequential, `useSequential`, false, `Read n-grams in sequential mode`)
+	flag.BoolVar(&useSequential, `sequential`, false, `Read n-grams in sequential mode`)
 
 	flag.BoolVar(&useHelp, `help`, false, `Print usage and exit`)
 
