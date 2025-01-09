@@ -11,8 +11,11 @@ A 1-gram is one character.
 A 2-gram is two adjacent characters.
 And so on.
 
-This utility counts bytes or n-grams in files and writes them into CSV files.
+This utility counts bytes or n-grams in files and writes the counts into CSV files.
 "CSV" stands for 'character separated value'.
+
+Only letters and numbers are counted.
+Specifically all characters that are in the [Unicode](https://home.unicode.org/) letter or number [categories](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category).
 
 ### Modes
 
@@ -20,14 +23,14 @@ The files can be analyzed in overlapping or sequential mode.
 Overlapping mode means that a window slides over the text, which is shifted one character at a time.
 Sequential mode means that the n-grams are analyzed one after the other.
 
-E.g., when the text `always` is analyzed the modes would produce the following results:
+E.g., when the text `always` is analyzed for 2-grams the modes would produce the following results:
 
 | Mode          | Results                      |
 |---------------|------------------------------|
 | `overlapping` | `al`, `lw`, `wa`, `ay`, `ys` |
 | `sequential`  | `al`, `wa`, `ys`             |
 
-Overlapping mode handles all file lengths, while sequential mode requires that the length of the characters in the file is a multiple of the n-gram size. 
+Overlapping mode handles all file lengths, while sequential mode requires that the number of characters in the file is a multiple of the n-gram size. 
 
 Overlapping mode is the default.
 
@@ -37,8 +40,8 @@ Text files are just a stream of bytes with no inherent meaning.
 There has to be a mapping between bytes and characters.
 I.e., each character is represented by a mapping into a sequence of bytes.
 This is called a [character encoding](https://en.wikipedia.org/wiki/Character_encoding).
-For n-gram counting this encoding needs to be specified.
-The list of valid file encodings is given later in this text.
+This encoding needs to be specified.
+The list of valid file encodings is given when the program is started with no arguments or the `help` option..
 
 ## Call
 
@@ -57,12 +60,12 @@ The options have the following meaning:
 | `size`       | Number of characters in an n-gram".                                               |
 | `encoding`   | Character encoding of the source file. Can be any of the list below.              |
 | `separator`  | Character used for separating fields in the CSV output. Can be either `,` or `;`. |
-| `sequential` | Calculate n-grams sequentially.                                                   |
+| `sequential` | Read n-grams sequentially.                                                        |
 | `files`      | List of file names whose contents are to be counted.                              |
 | `help`       | Print usage and exit.                                                             |
 
-For every file in the file list a file with the name `filename.csv` is written.
-I.e. the file name is appended with `.csv`.
+For every file in the file list a file with the name `<filebasename>_<ext>.csv` is written.
+I.e. the file name is appended changed so that the period of the extension becomes an underscore and is then appended with the `.csv` extension.
 
 The default for `separator` is `;`.
 This separator implies that the decimal separator is a `,`.
@@ -92,7 +95,7 @@ Here are the most important ones:
 | `win1250`   | [Windows 1250](https://en.wikipedia.org/wiki/Windows-1250)       |
 | `win1252`   | [Windows 1252](https://en.wikipedia.org/wiki/Windows-1252)       |
 
-`utf16` can be used as a synonym for `utf16le`.
+`utf16` is a synonym for `utf16le`.
 
 On Windows systems files are normally `Windows 1252`-encoded.
 Windows also uses `UTF-16LE` encoding.
@@ -105,9 +108,11 @@ It has to be specified by the user.
 
 However, there are a few exceptions to this rule.
 The encoding is known if a file begins with a "[byte-order mark](https://en.wikipedia.org/wiki/Byte_order_mark)".
-The three known byte-order marks are for `UTF-8`, `UTF-16BE` and `UTF-16LE`.
+There exist three known byte-order marks, namely for `UTF-8`, `UTF-16BE` and `UTF-16LE`.
 A byte-order mark is not mandatory for files encoded in one of those encodings.
 It may or may not be present.
+If it is present, the encoding is known.
+The program uses the encoding of the byte-order mark, if the file begins with one.
 
 ### Output
 

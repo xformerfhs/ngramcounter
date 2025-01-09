@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
+//    2025-01-09: V1.0.1: Correct CSV file error message.
 //
 
 package main
@@ -52,7 +53,7 @@ func countBytes(separator string) error {
 		var csvFileName string
 		csvFileName, err = resultwriter.WriteCountersToCSV(fileName, total, count, separator, false)
 		if err != nil {
-			return makeWriteError(fileName, err)
+			return makeWriteError(csvFileName, err)
 		}
 
 		printCSVInfo(csvFileName)

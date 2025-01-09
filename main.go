@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 2.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-08: V1.0.1: Remove unnecessary arguments in call of realMain.
-//    2025-01-08: V2.0.0: Scan n-grams in overlapped mode and use an option to revert to useSequential mode.
+//    2025-01-08: V2.0.0: Scan n-grams in overlapped mode and use an option to revert to sequential mode.
+//    2025-01-09: V2.0.1: Correct CSV write error message.
 //
 
 package main
@@ -33,23 +34,24 @@ package main
 import (
 	"ngramcounter/logger"
 	"os"
+	"runtime"
 )
 
 // myName contains the name of this executable.
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.0.0`
+const myVersion = `2.0.1`
 
 // ******** Formal main function ********
 
 // main is the main function and only a stub for a real main function.
 func main() {
-	logger.PrintInfof(11, `Begin %s v%s`, myName, myVersion)
+	logger.PrintInfof(11, `Begin %s V%s (%s)`, myName, myVersion, runtime.Version())
 	// Hack, so that we have a way to have args as arguments, set the exit code and run defer functions.
-	// This is a severe design deficiency of Go 1
+	// This is a severe design deficiency of Go 1.
 	rc := realMain()
-	logger.PrintInfof(12, `End %s v%s`, myName, myVersion)
+	logger.PrintInfof(12, `End %s V%s`, myName, myVersion)
 	os.Exit(rc)
 }
 

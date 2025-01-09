@@ -48,12 +48,12 @@ func printCSVInfo(fileName string) {
 
 // makeCountError build an error from an error and a file name for the count phase.
 func makeCountError(fileName string, err error) error {
-	return fmt.Errorf(`Error counting file '%s': %v`, fileName, err)
+	return fmt.Errorf(`Error analyzing file '%s': %v`, fileName, err)
 }
 
 // makeWriteError build an error from an error and a file name for the write phase.
 func makeWriteError(fileName string, err error) error {
-	return fmt.Errorf(`Error writing count file for file '%s': %v`, fileName, err)
+	return fmt.Errorf(`Error writing count file '%s': %v`, fileName, err)
 }
 
 // printUsage prints the usage text
