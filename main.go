@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.1
+// Version: 2.0.2
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-08: V1.0.1: Remove unnecessary arguments in call of realMain.
 //    2025-01-08: V2.0.0: Scan n-grams in overlapped mode and use an option to revert to sequential mode.
 //    2025-01-09: V2.0.1: Correct CSV write error message.
+//    2025-01-09: V2.0.2: Simplified sorting.
 //
 
 package main
@@ -41,7 +42,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.0.1`
+const myVersion = `2.0.2`
 
 // ******** Formal main function ********
 

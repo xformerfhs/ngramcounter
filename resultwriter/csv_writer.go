@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 2.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
-//    2025-01-08: V2.0.0: Return CSV file name.
+//    2025-01-08: V2.0.0: Return CSV file name and sort n-grams.
+//    2025-01-09: V2.0.1: Simplified sorting.
 //
 
 package resultwriter
@@ -38,7 +39,6 @@ import (
 	"ngramcounter/stringhelper"
 	"os"
 	"path/filepath"
-	"slices"
 )
 
 // ******** Private constants ********
@@ -62,8 +62,7 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 		return ``, err
 	}
 
-	ngramList := maphelper.Keys(counter)
-	slices.Sort(ngramList)
+	ngramList := maphelper.SortedKeys(counter)
 
 	inverseTotal := 1.0 / float64(total)
 	for _, ngram := range ngramList {

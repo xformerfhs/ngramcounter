@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
+//    2025-01-09: V1.0.1: Simplified sort call.
 //
 
 package encodinghelper
@@ -32,7 +33,6 @@ import (
 	"fmt"
 	"golang.org/x/text/encoding"
 	"ngramcounter/maphelper"
-	"slices"
 	"strings"
 	"unicode"
 )
@@ -51,8 +51,7 @@ func TranslateEncoding(charEncoding string) (encoding.Encoding, string, error) {
 
 // EncodingTextList returns the list of encodings as text.
 func EncodingTextList() []string {
-	keys := maphelper.Keys(textToEncoding)
-	slices.Sort(keys)
+	keys := maphelper.SortedKeys(textToEncoding)
 
 	result := make([]string, len(keys))
 	for i, k := range keys {
