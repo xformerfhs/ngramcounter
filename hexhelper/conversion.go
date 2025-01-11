@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
+//    2025-01-11: V1.0.1: Correct wrong function name.
 //
 
 package hexhelper
@@ -31,15 +32,15 @@ package hexhelper
 var byteHexTable []string
 
 func init() {
-	byteHexTable = buildByteHexTableTable()
+	byteHexTable = buildByteHexTable()
 }
 
 func ByteToString(b byte) string {
 	return byteHexTable[b]
 }
 
-// buildByteHexTableTable builds the index to the hexadecimal representation table.
-func buildByteHexTableTable() []string {
+// buildByteHexTable builds the index to the hexadecimal representation table.
+func buildByteHexTable() []string {
 	result := make([]string, 256)
 
 	for i := 0; i < 256; i++ {
