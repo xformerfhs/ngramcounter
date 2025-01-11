@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
+//    2025-01-11: V1.0.1: Improve description of output file name.
 //
 
 package main
@@ -69,7 +70,9 @@ Usage:`)
 	_, _ = fmt.Fprintf(os.Stderr, `
 followed by a list of file names.
 
-The results are written to '<filename>.csv', i.e. the filename with '.csv' appended.
+The results are written to '<filebasename_ext>.csv'.
+E.g., if the input file has the name 'strange.txt', the output file has the name 'strange_txt.csv'.
+If the CSV file already exists, it is overwritten.
 
 The format is a 'character separated value' file which can be imported e.g. by Excel.
 `)
