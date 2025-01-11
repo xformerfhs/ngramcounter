@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 2.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-08: V2.0.0: Use different modes, with "overlapped" being the default.
+//    2025-01-11: V2.0.1: Correct error message for incomplete n-grams in sequential mode.
 //
 
 package counters
@@ -108,7 +109,7 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 	if useSequential && collectorIndex != 0 {
 		return nil,
 			0,
-			fmt.Errorf(`File ends with an incomplete %d-gram: '%s'`, ngramSize, collector[:collectorIndex])
+			fmt.Errorf(`File ends with a %d-gram`, collectorIndex)
 	}
 
 	return result, ngramCounter, nil

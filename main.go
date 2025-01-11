@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.3
+// Version: 2.0.4
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -29,6 +29,7 @@
 //    2025-01-09: V2.0.1: Correct CSV write error message.
 //    2025-01-09: V2.0.2: Simplified sorting.
 //    2025-01-11: V2.0.3: Print mode.
+//    2025-01-11: V2.0.4: Correct error message for incomplete n-grams in sequential mode.
 //
 
 package main
@@ -43,7 +44,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.0.3`
+const myVersion = `2.0.4`
 
 // ******** Formal main function ********
 
