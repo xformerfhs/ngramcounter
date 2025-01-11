@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.4
+// Version: 2.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -30,6 +30,7 @@
 //    2025-01-09: V2.0.2: Simplified sorting.
 //    2025-01-11: V2.0.3: Print mode.
 //    2025-01-11: V2.0.4: Correct error message for incomplete n-grams in sequential mode.
+//    2025-01-11: V2.1.0: Simplify counting and make it faster.
 //
 
 package main
@@ -44,7 +45,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.0.4`
+const myVersion = `2.1.0`
 
 // ******** Formal main function ********
 
