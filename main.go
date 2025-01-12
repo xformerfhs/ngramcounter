@@ -31,6 +31,7 @@
 //    2025-01-11: V2.0.3: Print mode.
 //    2025-01-11: V2.0.4: Correct error message for incomplete n-grams in sequential mode.
 //    2025-01-11: V2.1.0: Simplify counting and make it faster.
+//    2025-01-12: V2.2.0: Simplify counting.
 //
 
 package main
@@ -45,7 +46,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.1.0`
+const myVersion = `2.2.0`
 
 // ******** Formal main function ********
 

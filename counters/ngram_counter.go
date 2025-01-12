@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.0
+// Version: 2.2.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-08: V2.0.0: Use different modes, with "overlapped" being the default.
 //    2025-01-11: V2.0.1: Correct error message for incomplete n-grams in sequential mode.
 //    2025-01-11: V2.1.0: Simplify preparing next collector state and make it faster.
+//    2025-01-12: V2.2.0: Simplify preparing next collector state.
 //
 
 package counters
@@ -121,54 +122,23 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 // prepareCollector prepares the collector for the next rune.
 func prepareCollector(collector []rune, collectorIndex uint, ngramSize uint, useSequential bool) uint {
 	if useSequential {
+		// Sequential mode reuses the collector from the start.
 		return 0
 	} else {
+		// Overlapped mode copies all elements of the collector one place to the left.
 		if ngramSize >= 8 {
+			// If there are 8 or more elements in the collector, use the copy function.
 			copy(collector, collector[1:ngramSize])
 		} else {
-			explicitCopy(collector, ngramSize)
+			// If there are less than 8 elements, a loop is faster.
+			ngramSize--
+			_ = collector[ngramSize] // Check index of upper limit only once.
+			for i, j := uint(0), uint(1); j <= ngramSize; j++ {
+				collector[i] = collector[j]
+				i = j
+			}
 		}
 
 		return collectorIndex - 1
 	}
-}
-
-// explicitCopy does an explicit copy of the collector elements.
-// This is faster than the copy function and a copy loop for sizes less than 8.
-func explicitCopy(collector []rune, ngramSize uint) {
-	ngramSize--
-
-	_ = collector[ngramSize] // Make boundary check only once.
-
-	collector[0] = collector[1]
-	ngramSize--
-	if ngramSize == 0 {
-		return
-	}
-
-	collector[1] = collector[2]
-	ngramSize--
-	if ngramSize == 0 {
-		return
-	}
-
-	collector[2] = collector[3]
-	ngramSize--
-	if ngramSize == 0 {
-		return
-	}
-
-	collector[3] = collector[4]
-	ngramSize--
-	if ngramSize == 0 {
-		return
-	}
-
-	collector[4] = collector[5]
-	ngramSize--
-	if ngramSize == 0 {
-		return
-	}
-
-	collector[5] = collector[6]
 }
