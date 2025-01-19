@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.1
+// Version: 2.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-08: V2.0.0: Return CSV file name and sort n-grams.
 //    2025-01-09: V2.0.1: Simplified sorting.
+//    2025-01-19: V2.1.0: Data is written in desceding count order.
 //
 
 package resultwriter
@@ -39,6 +40,7 @@ import (
 	"ngramcounter/stringhelper"
 	"os"
 	"path/filepath"
+	"slices"
 )
 
 // ******** Private constants ********
@@ -62,40 +64,16 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 		return ``, err
 	}
 
-	ngramList := maphelper.SortedKeys(counter)
+	//	ngramList := maphelper.SortedKeys(counter)
+	counts, countToNgrams := sortedKeysAndReverseCounterMap(counter)
 
 	inverseTotal := 1.0 / float64(total)
-	for _, ngram := range ngramList {
-		err = writeNgram(f, ngram)
-		if err != nil {
-			return ``, err
-		}
-
-		_, err = f.WriteString(separator)
-		if err != nil {
-			return ``, err
-		}
-
-		count := counter[ngram]
-
-		_, err = f.WriteString(fmt.Sprint(count))
-		if err != nil {
-			return ``, err
-		}
-
-		_, err = f.WriteString(separator)
-		if err != nil {
-			return ``, err
-		}
-
-		err = writePercentage(f, count, inverseTotal, separator)
-		if err != nil {
-			return ``, err
-		}
-
-		_, err = f.WriteString(platform.LineEnd)
-		if err != nil {
-			return ``, err
+	for _, count := range counts {
+		for _, ngram := range countToNgrams[count] {
+			err = writeLine(f, ngram, separator, count, inverseTotal)
+			if err != nil {
+				return ``, err
+			}
 		}
 	}
 
@@ -147,6 +125,40 @@ func writeHeader(f *os.File, isNGram bool, separator string) error {
 	if err != nil {
 		return err
 	}
+	_, err = f.WriteString(platform.LineEnd)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writeLine(f *os.File, ngram string, separator string, count uint64, inverseTotal float64) error {
+	err := writeNgram(f, ngram)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(separator)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(fmt.Sprint(count))
+	if err != nil {
+		return err
+	}
+
+	_, err = f.WriteString(separator)
+	if err != nil {
+		return err
+	}
+
+	err = writePercentage(f, count, inverseTotal, separator)
+	if err != nil {
+		return err
+	}
+
 	_, err = f.WriteString(platform.LineEnd)
 	if err != nil {
 		return err
@@ -232,4 +244,48 @@ func percentageTextFromCount(count uint64, inverseTotal float64, separator strin
 	}
 
 	return percentageText
+}
+
+// sortedKeysAndReverseCounterMap creates a map from counts to a slice of alphabetically sorted
+// n-grams that have been found this number of times and returns this map together with a sorted
+// slice of the keys in this map. The keys are sorted in descending order.
+func sortedKeysAndReverseCounterMap(counter map[string]uint64) ([]uint64, map[uint64][]string) {
+	reverseCounters := sortedReverseCounterMap(counter)
+
+	counts := maphelper.SortedKeys(reverseCounters)
+	slices.Reverse(counts)
+
+	return counts, reverseCounters
+}
+
+// sortedReverseCounterMap creates a map from counts to a slice of alphabetically sorted
+// n-grams that have been found this number of times.
+func sortedReverseCounterMap(counter map[string]uint64) map[uint64][]string {
+	reverseCounters := reverseCounterMap(counter)
+	for _, v := range reverseCounters {
+		if len(v) > 1 {
+			slices.Sort(v)
+		}
+	}
+
+	return reverseCounters
+}
+
+// reverseCounterMap creates a map from counts to a slice of n-grams that have
+// been found this number of times.
+func reverseCounterMap(counter map[string]uint64) map[uint64][]string {
+	reverseCounters := make(map[uint64][]string)
+	for k, v := range counter {
+		var ngramList []string
+
+		ngramList = reverseCounters[v]
+		if ngramList == nil {
+			ngramList = make([]string, 0)
+		}
+
+		ngramList = append(ngramList, k)
+		reverseCounters[v] = ngramList
+	}
+
+	return reverseCounters
 }
