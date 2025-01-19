@@ -64,7 +64,6 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 		return ``, err
 	}
 
-	//	ngramList := maphelper.SortedKeys(counter)
 	counts, countToNgrams := sortedKeysAndReverseCounterMap(counter)
 
 	inverseTotal := 1.0 / float64(total)
