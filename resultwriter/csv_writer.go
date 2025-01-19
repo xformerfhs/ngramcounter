@@ -64,7 +64,7 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 		return ``, err
 	}
 
-	counts, countToNgrams := sortedKeysAndReverseCounterMap(counter)
+	counts, countToNgrams := sortedKeysAndInvertedCounterMap(counter)
 
 	inverseTotal := 1.0 / float64(total)
 	for _, count := range counts {
@@ -245,46 +245,46 @@ func percentageTextFromCount(count uint64, inverseTotal float64, separator strin
 	return percentageText
 }
 
-// sortedKeysAndReverseCounterMap creates a map from counts to a slice of alphabetically sorted
+// sortedKeysAndInvertedCounterMap creates a map from counts to a slice of alphabetically sorted
 // n-grams that have been found this number of times and returns this map together with a sorted
 // slice of the keys in this map. The keys are sorted in descending order.
-func sortedKeysAndReverseCounterMap(counter map[string]uint64) ([]uint64, map[uint64][]string) {
-	reverseCounters := sortedReverseCounterMap(counter)
+func sortedKeysAndInvertedCounterMap(counter map[string]uint64) ([]uint64, map[uint64][]string) {
+	invertedCounters := sortedInvertedCounterMap(counter)
 
-	counts := maphelper.SortedKeys(reverseCounters)
+	counts := maphelper.SortedKeys(invertedCounters)
 	slices.Reverse(counts)
 
-	return counts, reverseCounters
+	return counts, invertedCounters
 }
 
-// sortedReverseCounterMap creates a map from counts to a slice of alphabetically sorted
+// sortedInvertedCounterMap creates a map from counts to a slice of alphabetically sorted
 // n-grams that have been found this number of times.
-func sortedReverseCounterMap(counter map[string]uint64) map[uint64][]string {
-	reverseCounters := reverseCounterMap(counter)
-	for _, v := range reverseCounters {
+func sortedInvertedCounterMap(counter map[string]uint64) map[uint64][]string {
+	invertedCounters := invertCounterMap(counter)
+	for _, v := range invertedCounters {
 		if len(v) > 1 {
 			slices.Sort(v)
 		}
 	}
 
-	return reverseCounters
+	return invertedCounters
 }
 
-// reverseCounterMap creates a map from counts to a slice of n-grams that have
+// invertCounterMap creates a map from counts to a slice of n-grams that have
 // been found this number of times.
-func reverseCounterMap(counter map[string]uint64) map[uint64][]string {
-	reverseCounters := make(map[uint64][]string)
+func invertCounterMap(counter map[string]uint64) map[uint64][]string {
+	invertedCounters := make(map[uint64][]string)
 	for k, v := range counter {
 		var ngramList []string
 
-		ngramList = reverseCounters[v]
+		ngramList = invertedCounters[v]
 		if ngramList == nil {
 			ngramList = make([]string, 0)
 		}
 
 		ngramList = append(ngramList, k)
-		reverseCounters[v] = ngramList
+		invertedCounters[v] = ngramList
 	}
 
-	return reverseCounters
+	return invertedCounters
 }
