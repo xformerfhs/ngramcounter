@@ -72,7 +72,7 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 	// 2. The buffered reader uses the transform reader.
 	br := bufio.NewReader(tr)
 
-	// 3. Now loop over the lines.
+	// 3. Now loop over the runes.
 	result := make(map[string]uint64)
 	collector := make([]rune, ngramSize)
 	collectorIndex := uint(0)
