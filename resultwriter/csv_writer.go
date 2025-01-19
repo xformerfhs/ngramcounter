@@ -26,7 +26,7 @@
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-08: V2.0.0: Return CSV file name and sort n-grams.
 //    2025-01-09: V2.0.1: Simplified sorting.
-//    2025-01-19: V2.1.0: Data is written in desceding count order.
+//    2025-01-19: V2.1.0: Data is written in descending count order.
 //
 
 package resultwriter
