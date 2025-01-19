@@ -48,7 +48,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.3.0`
+const myVersion = `2.4.0`
 
 // ******** Formal main function ********
 
