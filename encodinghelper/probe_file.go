@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
+//    2025-01-19: V1.1.0: Correct handling of short files.
 //
 
 package encodinghelper
@@ -36,13 +37,13 @@ import (
 
 // ******** Private constants ********
 
-// utf16BeBom contains the bytes of an UTF-16BE BOM.
+// utf16BeBom contains the bytes of a UTF-16BE BOM.
 var utf16BeBom = []byte{0xfe, 0xff}
 
-// utf16LeBom contains the bytes of an UTF-16LE BOM.
+// utf16LeBom contains the bytes of a UTF-16LE BOM.
 var utf16LeBom = []byte{0xff, 0xfe}
 
-// utf8Bom contains the bytes of an UTF-8 BOM.
+// utf8Bom contains the bytes of a UTF-8 BOM.
 var utf8Bom = []byte{0xef, 0xbb, 0xbf}
 
 // ******** Public functions ********
@@ -58,14 +59,21 @@ func ProbeFile(fileName string) (encoding.Encoding, string, error) {
 	defer filehelper.CloseFile(f)
 
 	// 1. Read the first three bytes.
+	var readCount int
 	miniBuffer := make([]byte, 3)
-	_, err = f.Read(miniBuffer)
+	readCount, err = f.Read(miniBuffer)
 	if err != nil {
 		return nil, ``, err
 	}
 
-	var ei encodingInfo
 	// 3. Check read bytes.
+
+	// File has only 1 byte. There is no BOM.
+	if readCount < 2 {
+		return nil, ``, nil
+	}
+
+	var ei encodingInfo
 	if miniBuffer[0] == utf16BeBom[0] &&
 		miniBuffer[1] == utf16BeBom[1] {
 		ei = textToEncoding[`utf16be`]
@@ -76,6 +84,11 @@ func ProbeFile(fileName string) (encoding.Encoding, string, error) {
 		miniBuffer[1] == utf16LeBom[1] {
 		ei = textToEncoding[`utf16le`]
 		return ei.encoding, ei.name, nil
+	}
+
+	// File has only 2 bytes. There is no UTF-8-BOM.
+	if readCount < 3 {
+		return nil, ``, nil
 	}
 
 	if miniBuffer[0] == utf8Bom[0] &&

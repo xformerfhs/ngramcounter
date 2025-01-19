@@ -20,18 +20,21 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.1.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Correct CSV file error message.
+//    2025-01-19: V1.1.0: Handle empty files correctly.
 //
 
 package main
 
 import (
+	"errors"
 	"flag"
 	"golang.org/x/text/encoding"
+	"io"
 	"ngramcounter/counters"
 	"ngramcounter/encodinghelper"
 	"ngramcounter/logger"
@@ -90,6 +93,10 @@ func countNGrams(charEncoding string, ngram uint, separator string, useSequentia
 func chooseCounter(fileName string, requestedEncoding encoding.Encoding, requestedNGramCounter *counters.NgramCounter) (*counters.NgramCounter, error) {
 	probedEncoding, probedEncodingName, err := encodinghelper.ProbeFile(fileName)
 	if err != nil {
+		if errors.Is(err, io.EOF) {
+			return requestedNGramCounter, nil
+		}
+
 		return nil, err
 	}
 
