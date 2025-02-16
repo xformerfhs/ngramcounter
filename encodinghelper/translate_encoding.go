@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Simplified sort call.
+//    2025-02-16: V1.1.0: Simplified name normalization.
 //
 
 package encodinghelper
@@ -33,6 +34,7 @@ import (
 	"fmt"
 	"golang.org/x/text/encoding"
 	"ngramcounter/maphelper"
+	"ngramcounter/stringhelper"
 	"strings"
 	"unicode"
 )
@@ -66,43 +68,54 @@ func EncodingTextList() []string {
 // normalizeEncoding normalizes the encoding text, so it is all lower case, contains no separators
 // and has a unique way to specify 'win' and 'cp'.
 func normalizeEncoding(charEncoding string) string {
-	normalizedText := cleanEncodingText(charEncoding)
+	normalizedEncoding := cleanEncodingText(charEncoding)
 
-	if strings.HasPrefix(normalizedText, `ibm`) {
-		normalizedText = normalizedText[3:]
+	// Change "macintoshx" to "macx". No other transformation is needed in this case.
+	if strings.HasPrefix(normalizedEncoding, `macintosh`) {
+		normalizedEncoding = `mac` + normalizedEncoding[9:]
+		return normalizedEncoding
 	}
 
-	if strings.HasPrefix(normalizedText, `macintosh`) {
-		normalizedText = strings.Replace(normalizedText, `macintosh`, `mac`, 1)
+	// The following cases are mutually exclusive, so they are put into a switch statement.
+	switch {
+	// Remove "ibm" from "ibmcodepage###".
+	case strings.HasPrefix(normalizedEncoding, `ibm`):
+		normalizedEncoding = normalizedEncoding[3:]
+
+	// Change "windowsx" to "winx".
+	case strings.HasPrefix(normalizedEncoding, `windows`):
+		normalizedEncoding = `win` + normalizedEncoding[7:]
 	}
 
-	if strings.Contains(normalizedText, `codepage`) {
-		normalizedText = strings.Replace(normalizedText, `codepage`, `cp`, 1)
+	// The following statements clean up special cases that may are produced by the previous ones.
+
+	// Change "wincodepagex" to "codepagex".
+	if strings.HasPrefix(normalizedEncoding, `wincodepage`) {
+		normalizedEncoding = normalizedEncoding[3:]
 	}
 
-	if strings.HasPrefix(normalizedText, `windows`) {
-		normalizedText = strings.Replace(normalizedText, `windows`, `win`, 1)
+	// Change "codepagex" to "cpx".
+	if strings.HasPrefix(normalizedEncoding, `codepage`) {
+		normalizedEncoding = `cp` + normalizedEncoding[8:]
 	}
 
-	if strings.HasPrefix(normalizedText, `wincp`) {
-		normalizedText = strings.Replace(normalizedText, `wincp`, `cp`, 1)
-	}
-
-	return normalizedText
+	return normalizedEncoding
 }
+
+var cleanBuilder stringhelper.Builder
 
 // cleanEncodingText converts an encoding specification into all lower-case and removes all separators.
 func cleanEncodingText(charEncoding string) string {
-	var result strings.Builder
-	result.Grow(len(charEncoding))
+	cleanBuilder.Ensure(len(charEncoding))
+	cleanBuilder.Reset()
 
 	for _, r := range charEncoding {
 		if r != '-' && r != '_' && r != '.' && r != ' ' {
-			result.WriteRune(unicode.ToLower(r))
+			_, _ = cleanBuilder.WriteRune(unicode.ToLower(r))
 		}
 	}
 
-	resultString := result.String()
+	resultString := cleanBuilder.String()
 
 	// utf16 has to be mapped to utf16le, as this is the default UTF-16 encoding on Windows.
 	if resultString == `utf16` {

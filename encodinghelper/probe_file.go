@@ -50,7 +50,6 @@ var utf8Bom = []byte{0xef, 0xbb, 0xbf}
 
 // ProbeFile reads the first bytes of a file to check for BOMs.
 // If it finds one, it returns the corresponding encoding.
-// On return the file's position is 0.
 func ProbeFile(fileName string) (encoding.Encoding, string, error) {
 	f, err := os.Open(fileName)
 	if err != nil {

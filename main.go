@@ -20,20 +20,21 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.4.0
+// Version: 2.4.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
-//    2025-01-08: V1.0.1: Remove unnecessary arguments in call of realMain.
+//    2025-01-08: V1.0.1: Removed unnecessary arguments in call of realMain.
 //    2025-01-08: V2.0.0: Scan n-grams in overlapped mode and use an option to revert to sequential mode.
-//    2025-01-09: V2.0.1: Correct CSV write error message.
+//    2025-01-09: V2.0.1: Corrected CSV write error message.
 //    2025-01-09: V2.0.2: Simplified sorting.
 //    2025-01-11: V2.0.3: Print mode.
-//    2025-01-11: V2.0.4: Correct error message for incomplete n-grams in sequential mode.
-//    2025-01-11: V2.1.0: Simplify counting and make it faster.
-//    2025-01-12: V2.2.0: Simplify counting.
+//    2025-01-11: V2.0.4: Corrected error message for incomplete n-grams in sequential mode.
+//    2025-01-11: V2.1.0: Simplified counting and make it faster.
+//    2025-01-12: V2.2.0: Simplified counting.
 //    2025-01-19: V2.3.0: Data is written in descending count order.
-//    2025-01-19: V2.4.0: Correct handling of short files.
+//    2025-01-19: V2.4.0: Corrected handling of short files.
+//    2025-02-16: V2.4.1: Simplified normalization of encoding names.
 //
 
 package main
@@ -48,7 +49,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.4.0`
+const myVersion = `2.4.1`
 
 // ******** Formal main function ********
 
