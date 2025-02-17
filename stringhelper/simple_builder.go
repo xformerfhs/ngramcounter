@@ -36,12 +36,30 @@ import (
 
 // A Builder is used to efficiently build a string using [Builder.Write] methods.
 // It minimizes memory copying and is intended to be reused and reset.
+// It differs from [strings.Builder] in that the byte buffer is reused and
+// the copying is done in the String function and not in the Reset function.
 // The zero value is ready to use. This Builder may be copied.
 type Builder struct {
-	// External users should never get direct access to this buffer, since
-	// the slice at some point will be converted to a string using unsafe, also
-	// data between len(buf) and cap(buf) might be uninitialized.
+	// External users should never get direct access to this buffer, as there
+	// may be data after the slice length.
 	buf []byte
+}
+
+// ******** Private constants ********
+
+// panicMessageNegativeCount contains the panic message that is issued,
+// when the count is negative.
+const panicMessageNegativeCount = `negative count`
+
+// ******** Creation functions ********
+
+// NewBuilder creates a new string builder with the specified capacity.
+func NewBuilder(n int) *Builder {
+	if n < 0 {
+		panic(panicMessageNegativeCount)
+	}
+
+	return &Builder{make([]byte, 0, n)}
 }
 
 // ******** Public functions ********
@@ -74,7 +92,7 @@ func (b *Builder) Reset() {
 // If n is negative, Ensure panics.
 func (b *Builder) Ensure(n int) {
 	if n < 0 {
-		panic(`negative count`)
+		panic(panicMessageNegativeCount)
 	}
 
 	if cap(b.buf) < n {
