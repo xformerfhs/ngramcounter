@@ -35,6 +35,7 @@
 //    2025-01-19: V2.3.0: Data is written in descending count order.
 //    2025-01-19: V2.4.0: Corrected handling of short files.
 //    2025-02-16: V2.4.1: Simplified normalization of encoding names.
+//    2025-03-18: V2.4.2: Correct counting message for 1-grams.
 //
 
 package main
@@ -49,7 +50,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.4.1`
+const myVersion = `2.4.2`
 
 // ******** Formal main function ********
 
@@ -91,7 +92,12 @@ func realMain() int {
 		err = countBytes(separator)
 	} else {
 		if ngramSize <= maxNGram {
-			logger.PrintInfof(14, `Counting %d-grams in %s mode`, ngramSize, modeText())
+			if ngramSize > 1 {
+				logger.PrintInfof(14, `Counting %d-grams in %s mode`, ngramSize, modeText())
+			} else {
+				logger.PrintInfof(14, `Counting %d-grams`, ngramSize)
+			}
+
 			err = countNGrams(charEncoding, ngramSize, separator, useSequential)
 		} else {
 			logger.PrintErrorf(15, `n-gram count '%d' is too large (max=%d)`, ngramSize, maxNGram)
