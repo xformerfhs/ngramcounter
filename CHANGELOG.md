@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
+## [2.4.2] - 2025-03-18
+
+### Changed
+- Correct counting message for 1-grams.
+
+## [2.4.1] - 2025-02-16
+
+### Changed
+- Simplified normalization of encoding names.
+
+## [2.4.0] - 2025-01-19
+
+### Changed
+- Corrected handling of short files.
+
 ## [2.3.0] - 2025-01-19
 
 ### Changed
