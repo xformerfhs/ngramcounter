@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-06-23: V1.0.0: Created.
+//    2025-06-23: V1.0.1: Better naming for string escaping functions and constants.
 //
 
 package resultwriter
@@ -41,7 +42,14 @@ import (
 
 // ******** Private constants ********
 
-const fieldSeparator = ","
+// fieldSeparator is the field separator character.
+const fieldSeparator = `,`
+
+// stringDelimiter is the character that encloses strings.
+const stringDelimiter = `"`
+
+// escapedStringDelimiter is the escaped string delimiter.
+const escapedStringDelimiter = `""`
 
 // ******** Public functions ********
 
@@ -163,22 +171,23 @@ func writeLine(f *os.File, ngram string, count uint64, inverseTotal float64) err
 	return nil
 }
 
-// writeNgram writes the value of the [ngram] with the correct formatting for Excel.
+// writeNgram writes the value of the ngram enclosed by string delimiters and
+// escaped string delimiters.
 func writeNgram(f *os.File, ngram string) error {
-	_, err := f.WriteString(`"`)
+	_, err := f.WriteString(stringDelimiter)
 	if err != nil {
 		return err
 	}
 
-	// Double all double quotes if necessary.
-	ngram = doubleDoubleQuotes(ngram)
+	// Escape string delimiters if necessary.
+	ngram = escapeStringDelimiters(ngram)
 
 	_, err = f.WriteString(ngram)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.WriteString(`"`)
+	_, err = f.WriteString(stringDelimiter)
 	if err != nil {
 		return err
 	}
@@ -186,11 +195,12 @@ func writeNgram(f *os.File, ngram string) error {
 	return nil
 }
 
-// doubleDoubleQuotes replaces all double quotes by double double quotes.
-func doubleDoubleQuotes(s string) string {
-	pos := strings.IndexByte(s, '"')
-	if pos != -1 {
-		return strings.Replace(s, `"`, `""`, -1)
+// escapeStringDelimiters escapes all string delimiters.
+// If there are no string delimiters in the string, the string is returned unchanged.
+func escapeStringDelimiters(s string) string {
+	pos := strings.IndexByte(s, stringDelimiter[0])
+	if pos >= 0 {
+		return strings.ReplaceAll(s, stringDelimiter, escapedStringDelimiter)
 	}
 	return s
 }

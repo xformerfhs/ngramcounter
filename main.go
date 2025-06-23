@@ -38,6 +38,7 @@
 //    2025-03-18: V2.4.2: Correct counting message for 1-grams.
 //    2025-06-22: V2.5.0: Added "allChars" option.
 //    2025-06-23: V3.0.0: Write text files, no "separator" option, anymore.
+//    2025-06-23: V3.0.1: Refactored the result writer.
 //
 
 package main
@@ -52,7 +53,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `3.0.0`
+const myVersion = `3.0.1`
 
 // ******** Formal main function ********
 
