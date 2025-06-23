@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.4.1
+// Version: 3.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -36,6 +36,8 @@
 //    2025-01-19: V2.4.0: Corrected handling of short files.
 //    2025-02-16: V2.4.1: Simplified normalization of encoding names.
 //    2025-03-18: V2.4.2: Correct counting message for 1-grams.
+//    2025-06-22: V2.5.0: Added "allChars" option.
+//    2025-06-23: V3.0.0: Write text files, no "separator" option, anymore.
 //
 
 package main
@@ -50,7 +52,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `2.4.2`
+const myVersion = `3.0.0`
 
 // ******** Formal main function ********
 
@@ -89,16 +91,16 @@ func realMain() int {
 
 	if ngramSize == 0 {
 		logger.PrintInfo(13, `Counting bytes`)
-		err = countBytes(separator)
+		err = countBytes()
 	} else {
 		if ngramSize <= maxNGram {
 			if ngramSize > 1 {
-				logger.PrintInfof(14, `Counting %d-grams in %s mode`, ngramSize, modeText())
+				logger.PrintInfof(14, `Counting %d-grams with %s in %s mode`, ngramSize, charsText(), modeText())
 			} else {
-				logger.PrintInfof(14, `Counting %d-grams`, ngramSize)
+				logger.PrintInfof(14, `Counting %d-grams with %s`, ngramSize, charsText())
 			}
 
-			err = countNGrams(charEncoding, ngramSize, separator, useSequential)
+			err = countNGrams(charEncoding, ngramSize, useSequential, allChars)
 		} else {
 			logger.PrintErrorf(15, `n-gram count '%d' is too large (max=%d)`, ngramSize, maxNGram)
 			return rcCmdLineError
@@ -113,11 +115,20 @@ func realMain() int {
 	return rcOK
 }
 
-// modeText returns the string representation of the mode.
+// modeText returns the string representation of the useSequential flag.
 func modeText() string {
 	if useSequential {
 		return `sequential`
 	} else {
 		return `overlapping`
+	}
+}
+
+// charsText returns the string representation of the allChars flag.
+func charsText() string {
+	if allChars {
+		return `all characters`
+	} else {
+		return `only letters and numbers`
 	}
 }

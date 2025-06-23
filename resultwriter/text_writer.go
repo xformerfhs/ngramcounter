@@ -20,46 +20,46 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.1.0
+// Version: 1.0.0
 //
 // Change history:
-//    2024-03-10: V1.0.0: Created.
-//    2025-01-08: V2.0.0: Return CSV file name and sort n-grams.
-//    2025-01-09: V2.0.1: Simplified sorting.
-//    2025-01-19: V2.1.0: Data is written in descending count order.
+//    2025-06-23: V1.0.0: Created.
 //
 
 package resultwriter
 
 import (
-	"bytes"
 	"fmt"
 	"ngramcounter/filehelper"
 	"ngramcounter/maphelper"
 	"ngramcounter/platform"
-	"ngramcounter/stringhelper"
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 )
 
 // ******** Private constants ********
 
-// utf8BOM is the UTF-8 BOM byte sequence.
-var utf8BOM = []byte{0xef, 0xbb, 0xbf}
+const fieldSeparator = ","
 
 // ******** Public functions ********
 
-// WriteCountersToCSV writes the counter values to a CSV file.
-func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64, separator string, isNGram bool) (string, error) {
-	outFileName := csvFileName(fileName)
+// WriteCountersToTextFile writes the counter values to a CSV file.
+func WriteCountersToTextFile(
+	fileName string,
+	total uint64,
+	counter map[string]uint64,
+	isNGram bool,
+) (string, error) {
+	outFileName := outputFileName(fileName)
 	f, err := os.OpenFile(outFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return ``, err
 	}
 	defer filehelper.CloseFile(f)
 
-	err = writeHeader(f, isNGram, separator)
+	err = writeHeader(f, isNGram)
 	if err != nil {
 		return ``, err
 	}
@@ -69,7 +69,7 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 	inverseTotal := 1.0 / float64(total)
 	for _, count := range counts {
 		for _, ngram := range countToNgrams[count] {
-			err = writeLine(f, ngram, separator, count, inverseTotal)
+			err = writeLine(f, ngram, count, inverseTotal)
 			if err != nil {
 				return ``, err
 			}
@@ -81,23 +81,19 @@ func WriteCountersToCSV(fileName string, total uint64, counter map[string]uint64
 
 // ******** Private functions ********
 
-// csvFileName builds the CSV file name from the components of the input file.
-func csvFileName(fileName string) string {
+// outputFileName builds the output file name from the components of the input file.
+func outputFileName(fileName string) string {
 	dir, base, ext := filehelper.PathComponents(fileName)
 	if len(ext) != 0 {
 		base = base + `_` + ext[1:]
 	}
 
-	return filepath.Join(dir, base+`.csv`)
+	return filepath.Join(dir, base+`.txt`)
 }
 
-// writeHeader writes the CSV header.
-func writeHeader(f *os.File, isNGram bool, separator string) error {
-	// Excel ought to know that this file is UTF-8 encoded.
-	_, err := f.Write(utf8BOM)
-	if err != nil {
-		return err
-	}
+// writeHeader writes the text file header.
+func writeHeader(f *os.File, isNGram bool) error {
+	var err error
 
 	if isNGram {
 		_, err = f.WriteString(`NGram`)
@@ -108,7 +104,7 @@ func writeHeader(f *os.File, isNGram bool, separator string) error {
 		return err
 	}
 
-	_, err = f.WriteString(separator)
+	_, err = f.WriteString(fieldSeparator)
 	if err != nil {
 		return err
 	}
@@ -116,7 +112,7 @@ func writeHeader(f *os.File, isNGram bool, separator string) error {
 	if err != nil {
 		return err
 	}
-	_, err = f.WriteString(separator)
+	_, err = f.WriteString(fieldSeparator)
 	if err != nil {
 		return err
 	}
@@ -132,13 +128,14 @@ func writeHeader(f *os.File, isNGram bool, separator string) error {
 	return nil
 }
 
-func writeLine(f *os.File, ngram string, separator string, count uint64, inverseTotal float64) error {
+// writeLine writes one line of data.
+func writeLine(f *os.File, ngram string, count uint64, inverseTotal float64) error {
 	err := writeNgram(f, ngram)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.WriteString(separator)
+	_, err = f.WriteString(fieldSeparator)
 	if err != nil {
 		return err
 	}
@@ -148,12 +145,12 @@ func writeLine(f *os.File, ngram string, separator string, count uint64, inverse
 		return err
 	}
 
-	_, err = f.WriteString(separator)
+	_, err = f.WriteString(fieldSeparator)
 	if err != nil {
 		return err
 	}
 
-	err = writePercentage(f, count, inverseTotal, separator)
+	err = writePercentage(f, count, inverseTotal)
 	if err != nil {
 		return err
 	}
@@ -168,20 +165,13 @@ func writeLine(f *os.File, ngram string, separator string, count uint64, inverse
 
 // writeNgram writes the value of the [ngram] with the correct formatting for Excel.
 func writeNgram(f *os.File, ngram string) error {
-	err := writeTextPrefixIfStartsWithDigit(f, ngram)
+	_, err := f.WriteString(`"`)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.WriteString(`"`)
-	if err != nil {
-		return err
-	}
-
-	// A double quote needs to be doubled for Excel to understand it.
-	if ngram == `"` {
-		ngram = `""`
-	}
+	// Double all double quotes if necessary.
+	ngram = doubleDoubleQuotes(ngram)
 
 	_, err = f.WriteString(ngram)
 	if err != nil {
@@ -196,24 +186,18 @@ func writeNgram(f *os.File, ngram string) error {
 	return nil
 }
 
-// writeTextPrefixIfStartsWithDigit writes a text prefix if the [ngram] starts with
-// a digit character, as Excel otherwise would interpret this as a number, instead of a text.
-func writeTextPrefixIfStartsWithDigit(f *os.File, ngram string) error {
-	firstByte := ngram[0]
-	if firstByte >= '0' && firstByte <= '9' {
-		// The "=" is needed so that Excel understands that this is a text, not a number.
-		_, err := f.WriteString(`=`)
-		if err != nil {
-			return err
-		}
+// doubleDoubleQuotes replaces all double quotes by double double quotes.
+func doubleDoubleQuotes(s string) string {
+	pos := strings.IndexByte(s, '"')
+	if pos != -1 {
+		return strings.Replace(s, `"`, `""`, -1)
 	}
-
-	return nil
+	return s
 }
 
 // writePercentage writes the count as a percentage of the total.
-func writePercentage(f *os.File, count uint64, inverseTotal float64, separator string) error {
-	fractionText := percentageTextFromCount(count, inverseTotal, separator)
+func writePercentage(f *os.File, count uint64, inverseTotal float64) error {
+	fractionText := percentageTextFromCount(count, inverseTotal)
 
 	_, err := f.WriteString(fractionText)
 	if err != nil {
@@ -230,19 +214,8 @@ func writePercentage(f *os.File, count uint64, inverseTotal float64, separator s
 
 // percentageTextFromCount builds the percent text from [count] and [inverseTotal]
 // and changes the decimal separator depending on [separator].
-func percentageTextFromCount(count uint64, inverseTotal float64, separator string) string {
-	percentage := float64(count) * inverseTotal * 100
-	percentageText := fmt.Sprint(percentage)
-	if separator[0] != ',' {
-		// Replace '.' with ',', if separator is not ','.
-		percentageBytes := stringhelper.UnsafeStringBytes(percentageText)
-		pos := bytes.IndexByte(percentageBytes, '.')
-		if pos >= 0 {
-			percentageBytes[pos] = ','
-		}
-	}
-
-	return percentageText
+func percentageTextFromCount(count uint64, inverseTotal float64) string {
+	return fmt.Sprint(float64(count) * inverseTotal * 100)
 }
 
 // sortedKeysAndInvertedCounterMap creates a map from counts to a slice of alphabetically sorted

@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 2.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Correct CSV file error message.
+//    2025-06-23: V2.0.0: Output text file.
 //
 
 package main
@@ -37,7 +38,7 @@ import (
 )
 
 // countBytes counts the bytes in all specified files.
-func countBytes(separator string) error {
+func countBytes() error {
 	var err error
 	var count map[string]uint64
 	var total uint64
@@ -50,13 +51,13 @@ func countBytes(separator string) error {
 			return makeCountError(fileName, err)
 		}
 
-		var csvFileName string
-		csvFileName, err = resultwriter.WriteCountersToCSV(fileName, total, count, separator, false)
+		var outputFileName string
+		outputFileName, err = resultwriter.WriteCountersToTextFile(fileName, total, count, false)
 		if err != nil {
-			return makeWriteError(csvFileName, err)
+			return makeWriteError(outputFileName, err)
 		}
 
-		printCSVInfo(csvFileName)
+		printOutputInfo(outputFileName)
 	}
 
 	return nil

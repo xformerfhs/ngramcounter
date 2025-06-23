@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
+## [3.0.0] - 2025-06-23
+
+### Changed
+- Output is now one precisely defined text file format. CSV files are no longer supported as Excel has strange and bizarre conversion rules.
+- The option "separator" is therefore no longer present. 
+
+## [2.5.0] - 2025-06-22
+
+### Changed
+- Allow counting all characters.
+
 ## [2.4.2] - 2025-03-18
 
 ### Changed

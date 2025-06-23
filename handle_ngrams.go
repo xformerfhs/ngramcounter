@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.1.0
+// Version: 2.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Correct CSV file error message.
 //    2025-01-19: V1.1.0: Handle empty files correctly.
+//    2025-06-22: V2.0.0: Handle "allChars" option.
 //
 
 package main
@@ -42,7 +43,12 @@ import (
 )
 
 // countNGrams counts n-grams in all specified files.
-func countNGrams(charEncoding string, ngram uint, separator string, useSequential bool) error {
+func countNGrams(
+	charEncoding string,
+	ngram uint,
+	useSequential bool,
+	allChars bool,
+) error {
 	var err error
 	var count map[string]uint64
 	var total uint64
@@ -55,7 +61,7 @@ func countNGrams(charEncoding string, ngram uint, separator string, useSequentia
 		return err
 	}
 
-	requestedNgramCounter := counters.NewNgramCounter(requestedEncoding)
+	requestedNgramCounter := counters.NewNgramCounter(requestedEncoding, allChars)
 
 	logger.PrintInfof(19, `File encoding is '%s'`, requestedEncodingName)
 
@@ -76,21 +82,25 @@ func countNGrams(charEncoding string, ngram uint, separator string, useSequentia
 			return makeCountError(fileName, err)
 		}
 
-		// 5. Write result.
-		var csvFileName string
-		csvFileName, err = resultwriter.WriteCountersToCSV(fileName, total, count, separator, true)
+		// 5. Write the result.
+		var outputFileName string
+		outputFileName, err = resultwriter.WriteCountersToTextFile(fileName, total, count, true)
 		if err != nil {
-			return makeWriteError(csvFileName, err)
+			return makeWriteError(outputFileName, err)
 		}
 
-		printCSVInfo(csvFileName)
+		printOutputInfo(outputFileName)
 	}
 
 	return nil
 }
 
 // chooseCounter checks if the file has a byte-order-mark and returns the corresponding counter.
-func chooseCounter(fileName string, requestedEncoding encoding.Encoding, requestedNGramCounter *counters.NgramCounter) (*counters.NgramCounter, error) {
+func chooseCounter(
+	fileName string,
+	requestedEncoding encoding.Encoding,
+	requestedNGramCounter *counters.NgramCounter,
+) (*counters.NgramCounter, error) {
 	probedEncoding, probedEncodingName, err := encodinghelper.ProbeFile(fileName)
 	if err != nil {
 		if errors.Is(err, io.EOF) {
@@ -102,7 +112,7 @@ func chooseCounter(fileName string, requestedEncoding encoding.Encoding, request
 
 	if probedEncoding != nil && probedEncoding != requestedEncoding {
 		logger.PrintInfof(20, `File '%s' has a %s byte-order mark and is read with this encoding`, fileName, probedEncodingName)
-		return counters.NewNgramCounter(probedEncoding), nil
+		return counters.NewNgramCounter(probedEncoding, allChars), nil
 	}
 
 	return requestedNGramCounter, nil

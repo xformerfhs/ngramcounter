@@ -20,10 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 3.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
+//    2025-06-22: V2.0.0: New option "allchars".
+//    2025-06-23: V3.0.0: Remove option "separator".
 //
 
 package main
@@ -49,11 +51,11 @@ var ngramSize uint
 // charEncoding is the character encoding of the source file.
 var charEncoding string
 
-// separator is the output field separator character.
-var separator string
-
 // useSequential specifies that the n-grams should be read useSequential and not overlapped.
 var useSequential bool
+
+// allChars specifies that all characters are to be counted.
+var allChars bool
 
 // useHelp specifies that the help should be printed.
 var useHelp bool
@@ -66,9 +68,9 @@ func defineCommandLineFlags() {
 
 	flag.StringVar(&charEncoding, `encoding`, encodinghelper.PlatformDefaultEncoding(), `Character encoding for n-grams`)
 
-	flag.StringVar(&separator, `separator`, `;`, `Output field separator (either ',' or ';')`)
-
 	flag.BoolVar(&useSequential, `sequential`, false, `Read n-grams in sequential mode`)
+
+	flag.BoolVar(&allChars, `allchars`, false, `Count all UTF-8 characters`)
 
 	flag.BoolVar(&useHelp, `help`, false, `Print usage and exit`)
 
@@ -82,11 +84,6 @@ func checkCommandLineFlags() int {
 	if flag.NArg() == 0 {
 		logger.PrintError(21, `File names missing`)
 		printUsage()
-		return rcCmdLineError
-	}
-
-	if separator != `,` && separator != `;` {
-		logger.PrintErrorf(22, `Separator must be either ',' or ';' but is '%s'`, separator)
 		return rcCmdLineError
 	}
 

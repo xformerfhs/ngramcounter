@@ -11,11 +11,7 @@ A 1-gram is one character.
 A 2-gram is two adjacent characters.
 And so on.
 
-This utility counts bytes or n-grams in files and writes the counts into CSV files.
-"CSV" stands for 'character separated value'.
-
-Only letters and numbers are counted.
-Specifically all characters that are in the [Unicode](https://home.unicode.org/) letter or number [categories](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category).
+This utility counts bytes or n-grams in files and writes the counts into text files.
 
 ### Modes
 
@@ -55,21 +51,19 @@ ngramcounter [-size <count>] [-encoding <encoding>] [-separator <char>] [-sequen
 
 The options have the following meaning:
 
-| Option       | Meaning                                                                           |
-|--------------|-----------------------------------------------------------------------------------|
-| `size`       | Number of characters in an n-gram".                                               |
-| `encoding`   | Character encoding of the source file. Can be any of the list below.              |
-| `separator`  | Character used for separating fields in the CSV output. Can be either `,` or `;`. |
-| `sequential` | Read n-grams sequentially.                                                        |
-| `files`      | List of file names whose contents are to be counted.                              |
-| `help`       | Print usage and exit.                                                             |
+| Option       | Meaning                                                              |
+|--------------|----------------------------------------------------------------------|
+| `size`       | Number of characters in an n-gram".                                  |
+| `encoding`   | Character encoding of the source file. Can be any of the list below. |
+| `allchars`   | Count all characters.                                                |
+| `sequential` | Read n-grams sequentially.                                           |
+| `files`      | List of file names whose contents are to be counted.                 |
+| `help`       | Print usage and exit.                                                |
 
-For every file in the file list a file with the name `<filebasename>_<ext>.csv` is written.
-I.e. the file name is appended changed so that the period of the extension becomes an underscore and is then appended with the `.csv` extension.
+For every file in the file list a file with the name `<filebasename>_<ext>.txt` is written.
+I.e., the file name is appended changed so that the period of the extension becomes an underscore and is then appended with the `.txt` extension.
 
-The default for `separator` is `;`.
-This separator implies that the decimal separator is a `,`.
-If `separator` is specified as `,` the decimal separator is `.`.
+If `allchars` is **not** present, only letters and digits are counted.
 
 If `sequential` is not specified, the files are analyzed in overlapping mode.
 
@@ -123,6 +117,16 @@ The resulting output file has three columns:
 | Byte/N-gram | Byte or n-gram.                                                      |
 | Count       | Number of the times the byte or n-gram if found in the file.         |
 | Share       | Share of the byte or n-gram of the total number of bytes or n-grams. |
+
+The field separator is a comma (`,`).
+All bytes and n-grams are enclosed in double quotes (`"`).
+If a double quote is present in an n-gram it is written as a double double quote (`""`).
+The share is written as numbers with periods as decimal separators followed by a `%` character.
+
+Do **not** open this file as a CSV file in Excel!
+Excel has weird transformation rules for CSV files.
+Instead, open the file as a text file and format the first column as text.
+Remember to set `.` as the decimal separator and `,` as the field separator.
 
 ### Return codes
 

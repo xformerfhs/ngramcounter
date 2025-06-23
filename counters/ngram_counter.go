@@ -48,14 +48,15 @@ import (
 
 // NgramCounter contains the encoding data for an NgramCounter.
 type NgramCounter struct {
-	decoder *encoding.Decoder
+	decoder               *encoding.Decoder
+	onlyLettersAndNumbers bool
 }
 
 // ******** Public functions ********
 
 // NewNgramCounter returns a new NGramCounter for the given encoding text.
-func NewNgramCounter(enc encoding.Encoding) *NgramCounter {
-	return &NgramCounter{decoder: enc.NewDecoder()}
+func NewNgramCounter(enc encoding.Encoding, allChars bool) *NgramCounter {
+	return &NgramCounter{decoder: enc.NewDecoder(), onlyLettersAndNumbers: !allChars}
 }
 
 // CountNGrams counts the n-grams in the file.
@@ -77,6 +78,7 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 	collector := make([]rune, ngramSize)
 	collectorIndex := uint(0)
 	ngramCounter := uint64(0)
+	onlyLettersAndNumbers := nc.onlyLettersAndNumbers
 	for {
 		// Read rune and bail out, if there is an error or EOF.
 		var r rune
@@ -89,8 +91,14 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 			}
 		}
 
-		// Only look at letters and numbers.
-		if !unicode.In(r, unicode.L, unicode.N) {
+		// Never count control characters.
+		// Space?
+		if unicode.IsControl(r) {
+			continue
+		}
+
+		// Only look at letters and numbers, if this is wanted.
+		if onlyLettersAndNumbers && !unicode.In(r, unicode.L, unicode.N) {
 			continue
 		}
 

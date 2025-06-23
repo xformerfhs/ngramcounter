@@ -42,8 +42,8 @@ func printAnalysisInfo(fileName string) {
 	logger.PrintInfof(31, `Analyzing file '%s'`, fileName)
 }
 
-// printCSVInfo prints the output file name.
-func printCSVInfo(fileName string) {
+// printOutputInfo prints the output file name.
+func printOutputInfo(fileName string) {
 	logger.PrintInfof(32, `CSV file: '%s'`, fileName)
 }
 
@@ -63,18 +63,27 @@ func printUsage() {
 
 Usage:`)
 
-	_, _ = fmt.Fprintf(os.Stderr, "\n%s [-size <count>] [-encoding <encoding>] [-separator <char>] [-sequential] [files...]\n\nwith the following options:\n\n",
+	_, _ = fmt.Fprintf(os.Stderr, "\n%s [-size <count>] [-encoding <encoding>] [-allchars] [-sequential] [files...]\n\nwith the following options:\n\n",
 		myName)
 	flag.PrintDefaults()
 
 	_, _ = fmt.Fprintf(os.Stderr, `
 followed by a list of file names.
 
-The results are written to '<filebasename_ext>.csv'.
-E.g., if the input file has the name 'strange.txt', the output file has the name 'strange_txt.csv'.
-If the CSV file already exists, it is overwritten.
+The results are written as a text file to '<filebasename_ext>.txt'.
+E.g., if the input file has the name 'strange.txt', the output file has the name 'strange_txt.txt'.
+If the text file already exists, it is overwritten.
 
-The format is a 'character separated value' file which can be imported e.g. by Excel.
+The format is a 'character separated value' file which can be imported by other programs.
+The text file has column headers.
+The field separator is a comma (',').
+The n-grams are enclosed in double quotes.
+Double quotes in n-grams are doubled. I.e. a single '"' is output as '"""'.
+Share is output in percent with a period ('.') as the decimal separator followed by a '%%' character.
+
+Do *not* attempt to open this file as a CSV file in Excel! Excel has bizarre and strange import rules.
+Always import the file in Excel as a text file and specify that the first column has text format.
+Set ',' as the field separator and '.' as the decimal separator.
 `)
 
 	_, _ = fmt.Fprintln(os.Stderr, "\n'encoding' can be one of the following values of the first column:")
