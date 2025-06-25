@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.0.0
+// Version: 3.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -39,6 +39,7 @@
 //    2025-06-22: V2.5.0: Added "allChars" option.
 //    2025-06-23: V3.0.0: Write text files, no "separator" option, anymore.
 //    2025-06-23: V3.0.1: Refactored the result writer.
+//    2025-06-25: V3.0.2: Simplified n-gram counter.
 //
 
 package main
@@ -53,7 +54,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `3.0.1`
+const myVersion = `3.0.2`
 
 // ******** Formal main function ********
 

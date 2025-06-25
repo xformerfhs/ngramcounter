@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.2.0
+// Version: 2.3.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -28,6 +28,7 @@
 //    2025-01-11: V2.0.1: Correct error message for incomplete n-grams in sequential mode.
 //    2025-01-11: V2.1.0: Simplify preparing next collector state and make it faster.
 //    2025-01-12: V2.2.0: Simplify preparing next collector state.
+//    2025-06-25: V2.3.0: Simplify "CountNGrams" function.
 //
 
 package counters
@@ -61,71 +62,76 @@ func NewNgramCounter(enc encoding.Encoding, allChars bool) *NgramCounter {
 
 // CountNGrams counts the n-grams in the file.
 func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequential bool) (map[string]uint64, uint64, error) {
-	f, err := os.Open(fileName)
+	br, file, err := nc.openAndWrapFile(fileName)
 	if err != nil {
 		return nil, 0, err
 	}
-	defer filehelper.CloseFile(f)
+	defer filehelper.CloseFile(file)
 
-	// 1. Wrap the file in a transform that decodes the character encoding to UTF-8.
-	tr := transform.NewReader(f, nc.decoder)
-
-	// 2. The buffered reader uses the transform reader.
-	br := bufio.NewReader(tr)
-
-	// 3. Now loop over the runes.
 	result := make(map[string]uint64)
 	collector := make([]rune, ngramSize)
 	collectorIndex := uint(0)
 	ngramCounter := uint64(0)
-	onlyLettersAndNumbers := nc.onlyLettersAndNumbers
+
 	for {
-		// Read rune and bail out, if there is an error or EOF.
 		var r rune
 		r, _, err = br.ReadRune()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				break
-			} else {
-				return nil, 0, err
 			}
+
+			return nil, 0, err
 		}
 
-		// Never count control characters.
-		// Space?
-		if unicode.IsControl(r) {
+		if nc.shouldSkipRune(r) {
 			continue
 		}
 
-		// Only look at letters and numbers, if this is wanted.
-		if onlyLettersAndNumbers && !unicode.In(r, unicode.L, unicode.N) {
-			continue
-		}
-
-		// Put rune in collector.
 		collector[collectorIndex] = r
 		collectorIndex++
 
-		// Count n-gram, if collector is full.
 		if collectorIndex == ngramSize {
+			ngramCounter++
 			ngram := string(collector)
 			result[ngram]++
-			ngramCounter++
-
 			collectorIndex = prepareCollector(collector, collectorIndex, ngramSize, useSequential)
 		}
 	}
 
 	if useSequential && collectorIndex != 0 {
-		return nil,
-			0,
-			fmt.Errorf(`File ends with a %d-gram`, collectorIndex)
+		return nil, 0, fmt.Errorf(`File ends with a %d-gram`, collectorIndex)
 	}
 
 	return result, ngramCounter, nil
 }
 
 // ******** Private functions ********
+
+// openAndWrapFile opens the input file and wraps it in a buffered transforming reader.
+func (nc *NgramCounter) openAndWrapFile(fileName string) (*bufio.Reader, *os.File, error) {
+	f, err := os.Open(fileName)
+	if err != nil {
+		return nil, nil, err
+	}
+	tr := transform.NewReader(f, nc.decoder)
+	br := bufio.NewReader(tr)
+
+	return br, f, nil
+}
+
+// shouldSkipRune reports whether the supplied rune should be skipped.
+func (nc *NgramCounter) shouldSkipRune(r rune) bool {
+	if unicode.IsControl(r) {
+		return true
+	}
+
+	if nc.onlyLettersAndNumbers && !unicode.In(r, unicode.L, unicode.N) {
+		return true
+	}
+
+	return false
+}
 
 // prepareCollector prepares the collector for the next rune.
 func prepareCollector(collector []rune, collectorIndex uint, ngramSize uint, useSequential bool) uint {
