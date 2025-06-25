@@ -44,7 +44,7 @@ The list of valid file encodings is given when the program is started with no ar
 The program is called like this:
 
 ```
-ngramcounter [-size <count>] [-encoding <encoding>] [-separator <char>] [-sequential] [files...]
+ngramcounter [-size <count>] [-encoding <encoding>] [-allchars] [-sequential] [files...]
 ```
 
 ### Options
@@ -67,7 +67,7 @@ If `allchars` is **not** present, only letters and digits are counted.
 
 If `sequential` is not specified, the files are analyzed in overlapping mode.
 
-If no argument is specified a usage message is written.
+If no argument is specified, a usage message is written.
 This usage message contains a list of all supported encodings.
 
 #### Encoding
@@ -102,11 +102,11 @@ It has to be specified by the user.
 
 However, there are a few exceptions to this rule.
 The encoding is known if a file begins with a "[byte-order mark](https://en.wikipedia.org/wiki/Byte_order_mark)".
-There exist three known byte-order marks, namely for `UTF-8`, `UTF-16BE` and `UTF-16LE`.
+There are three known byte-order marks, namely for `UTF-8`, `UTF-16BE` and `UTF-16LE`.
 A byte-order mark is not mandatory for files encoded in one of those encodings.
 It may or may not be present.
 If it is present, the encoding is known.
-The program uses the encoding of the byte-order mark, if the file begins with one.
+The program uses the encoding of the byte-order mark if the file begins with one.
 
 ### Output
 
