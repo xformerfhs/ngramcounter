@@ -4,7 +4,7 @@ A program to count n-grams or bytes of files.
 
 ## Introduction
 
-When analyzing classic encryptions it is often necessary to count the frequencies of bytes or [n-grams](https://en.wikipedia.org/wiki/N-gram) of texts.
+When analyzing classic encryptions, it is often necessary to count the frequencies of bytes or [n-grams](https://en.wikipedia.org/wiki/N-gram) of texts.
 
 An n-gram is a sequence of n characters.
 A 1-gram is one character.
