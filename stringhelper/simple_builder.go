@@ -47,7 +47,7 @@ type Builder struct {
 
 // ******** Private constants ********
 
-// panicMessageNegativeCount contains the panic message that is issued,
+// panicMessageNegativeCount contains the panic message issued,
 // when the count is negative.
 const panicMessageNegativeCount = `negative count`
 
