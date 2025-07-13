@@ -50,7 +50,7 @@ import (
 	"runtime"
 )
 
-// myName contains the name of this executable.
+// myName contains the name of this executable. It is set in init.
 var myName string
 
 // myVersion contains the version number of this executable.
@@ -70,8 +70,8 @@ func main() {
 
 // ******** Private constants ********
 
-// maxNGram is the maximum allowed n-gram length
-const maxNGram = 50
+// maxNGramLen is the maximum allowed n-gram length
+const maxNGramLen = 50
 
 // ******** Private functions ********
 
@@ -95,7 +95,7 @@ func realMain() int {
 		logger.PrintInfo(13, `Counting bytes`)
 		err = countBytes()
 	} else {
-		if ngramSize <= maxNGram {
+		if ngramSize <= maxNGramLen {
 			if ngramSize > 1 {
 				logger.PrintInfof(14, `Counting %d-grams with %s in %s mode`, ngramSize, charsText(), modeText())
 			} else {
@@ -104,7 +104,7 @@ func realMain() int {
 
 			err = countNGrams(charEncoding, ngramSize, useSequential, allChars)
 		} else {
-			logger.PrintErrorf(15, `n-gram count '%d' is too large (max=%d)`, ngramSize, maxNGram)
+			logger.PrintErrorf(15, `n-gram count '%d' is too large (max=%d)`, ngramSize, maxNGramLen)
 			return rcCmdLineError
 		}
 	}
