@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.0
+// Version: 4.0.1
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-06-22: V2.0.0: New option "allchars".
 //    2025-06-23: V3.0.0: Remove option "separator".
 //    2025-08-23: V4.0.0: Check upper limit for "size" option.
+//    2025-08-24: V4.0.1: Correct handling of "size" option..
 //
 
 package main
@@ -49,7 +50,7 @@ const (
 // ******** Private constants ********
 
 // maxSize is the maximum size of an n-gram.
-const maxSize = 255
+const maxSize = 50
 
 // ******** Private variables ********
 

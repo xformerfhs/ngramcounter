@@ -162,6 +162,7 @@ func (nc *NgramCounter) shouldSkipRune(r rune) bool {
 // countNgram counts the n-gram in the count field.
 func countNgram(countField *avltreeslicekey.AVLTree[rune, uint64], collector []rune) {
 	count, found := countField.Search(collector)
+	fmt.Printf("%s: %d %v\n", string(collector), count, found)
 	if found {
 		countField.SetLastFound(count + 1)
 	} else {

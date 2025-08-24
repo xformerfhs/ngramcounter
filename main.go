@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.2.0
+// Version: 3.2.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -43,6 +43,7 @@
 //    2025-08-23: V3.1.0: Recognize UTF-32.
 //    2025-08-24: V3.1.1: Simplified handling of n-gram counter, implement maximum n-gram size.
 //    2025-08-24: V3.2.0: Use much less memory when counting n-grams.
+//    2025-08-24: V3.2.1: Correct handling of "size" option.
 //
 
 package main
@@ -57,7 +58,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `3.2.0`
+const myVersion = `3.2.1`
 
 // ******** Formal main function ********
 
@@ -70,11 +71,6 @@ func main() {
 	logger.PrintInfof(12, `End %s V%s`, myName, myVersion)
 	os.Exit(rc)
 }
-
-// ******** Private constants ********
-
-// maxNGramLen is the maximum allowed n-gram length
-const maxNGramLen = 50
 
 // ******** Private functions ********
 
@@ -98,18 +94,13 @@ func realMain() int {
 		logger.PrintInfo(13, `Counting bytes`)
 		err = countBytes()
 	} else {
-		if ngramSize <= maxNGramLen {
-			if ngramSize > 1 {
-				logger.PrintInfof(14, `Counting %d-grams with %s in %s mode`, ngramSize, charsText(), modeText())
-			} else {
-				logger.PrintInfof(14, `Counting %d-grams with %s`, ngramSize, charsText())
-			}
-
-			err = countNGrams(charEncoding, ngramSize, useSequential, allChars)
+		if ngramSize > 1 {
+			logger.PrintInfof(14, `Counting %d-grams with %s in %s mode`, ngramSize, charsText(), modeText())
 		} else {
-			logger.PrintErrorf(15, `n-gram count '%d' is too large (max=%d)`, ngramSize, maxNGramLen)
-			return rcCmdLineError
+			logger.PrintInfof(14, `Counting %d-grams with %s`, ngramSize, charsText())
 		}
+
+		err = countNGrams(charEncoding, ngramSize, useSequential, allChars)
 	}
 
 	if err != nil {
