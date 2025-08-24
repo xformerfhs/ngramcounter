@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.2.1
+// Version: 4.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -44,6 +44,7 @@
 //    2025-08-24: V3.1.1: Simplified handling of n-gram counter, implement maximum n-gram size.
 //    2025-08-24: V3.2.0: Use much less memory when counting n-grams.
 //    2025-08-24: V3.2.1: Correct handling of "size" option.
+//    2025-08-24: V4.0.0: Option to ignore white space characters.
 //
 
 package main
@@ -58,7 +59,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `3.2.1`
+const myVersion = `4.0.0`
 
 // ******** Formal main function ********
 
@@ -100,7 +101,7 @@ func realMain() int {
 			logger.PrintInfof(14, `Counting %d-grams with %s`, ngramSize, charsText())
 		}
 
-		err = countNGrams(charEncoding, ngramSize, useSequential, allChars)
+		err = countNGrams(charEncoding, ngramSize, useSequential, allChars, ignoreWhiteSpace)
 	}
 
 	if err != nil {

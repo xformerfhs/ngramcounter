@@ -20,14 +20,15 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.1
+// Version: 5.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-06-22: V2.0.0: New option "allchars".
 //    2025-06-23: V3.0.0: Remove option "separator".
 //    2025-08-23: V4.0.0: Check upper limit for "size" option.
-//    2025-08-24: V4.0.1: Correct handling of "size" option..
+//    2025-08-24: V4.0.1: Correct handling of "size" option.
+//    2025-08-24: V5.0.0: New option "ignorewhitespace".
 //
 
 package main
@@ -63,6 +64,9 @@ var charEncoding string
 // useSequential specifies that the n-grams should be read useSequential and not overlapped.
 var useSequential bool
 
+// ignoreWhiteSpace specifies that white space characters should be ignored.
+var ignoreWhiteSpace bool
+
 // allChars specifies that all characters are to be counted.
 var allChars bool
 
@@ -78,6 +82,8 @@ func defineCommandLineFlags() {
 	flag.StringVar(&charEncoding, `encoding`, encodinghelper.PlatformDefaultEncoding(), `Character encoding for n-grams`)
 
 	flag.BoolVar(&useSequential, `sequential`, false, `Read n-grams in sequential mode`)
+
+	flag.BoolVar(&ignoreWhiteSpace, `ignorewhitespace`, false, `Do not count whitespace characters`)
 
 	flag.BoolVar(&allChars, `allchars`, false, `Count all UTF-8 characters, not only letters and digits`)
 

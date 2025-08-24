@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.1.0
+// Version: 4.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -31,6 +31,7 @@
 //    2025-06-25: V2.3.0: Simplify "CountNGrams" function.
 //    2025-08-24: V3.0.0: Move all parameters to the constructor.
 //    2025-08-24: V3.1.0: Much less memory consumption because of the AVL tree.
+//    2025-08-24: V4.0.0: Option to ignore white space characters.
 //
 
 package counters
@@ -56,6 +57,7 @@ type NgramCounter struct {
 	decoder               *encoding.Decoder
 	onlyLettersAndNumbers bool
 	useSequential         bool
+	ignoreWhiteSpace      bool
 	ngramSize             uint8
 }
 
@@ -67,12 +69,14 @@ func NewNgramCounter(
 	ngramSize uint,
 	allChars bool,
 	useSequential bool,
+	ignoreWhiteSpace bool,
 ) *NgramCounter {
 	return &NgramCounter{
 		decoder:               enc.NewDecoder(),
 		ngramSize:             uint8(ngramSize),
 		onlyLettersAndNumbers: !allChars,
 		useSequential:         useSequential,
+		ignoreWhiteSpace:      ignoreWhiteSpace,
 	}
 }
 
@@ -156,13 +160,17 @@ func (nc *NgramCounter) shouldSkipRune(r rune) bool {
 		return true
 	}
 
+	if nc.ignoreWhiteSpace && unicode.IsSpace(r) {
+		return true
+	}
+
 	return false
 }
 
 // countNgram counts the n-gram in the count field.
 func countNgram(countField *avltreeslicekey.AVLTree[rune, uint64], collector []rune) {
 	count, found := countField.Search(collector)
-	fmt.Printf("%s: %d %v\n", string(collector), count, found)
+
 	if found {
 		countField.SetLastFound(count + 1)
 	} else {

@@ -51,21 +51,24 @@ ngramcounter [-size <count>] [-encoding <encoding>] [-allchars] [-sequential] [f
 
 The options have the following meaning:
 
-| Option       | Meaning                                                              |
-|--------------|----------------------------------------------------------------------|
-| `size`       | Number of characters in an n-gram".                                  |
-| `encoding`   | Character encoding of the source file. Can be any of the list below. |
-| `allchars`   | Count all characters.                                                |
-| `sequential` | Read n-grams sequentially.                                           |
-| `files`      | List of file names whose contents are to be counted.                 |
-| `help`       | Print usage and exit.                                                |
+| Option             | Meaning                                                              |
+|--------------------|----------------------------------------------------------------------|
+| `size`             | Number of characters in an n-gram".                                  |
+| `encoding`         | Character encoding of the source file. Can be any of the list below. |
+| `allchars`         | Count all characters.                                                |
+| `ignorewhitespace` | Ignore white space (Blank, Tab, etc.).                               |
+| `sequential`       | Read n-grams sequentially.                                           |
+| `files`            | List of file names whose contents are to be counted.                 |
+| `help`             | Print usage and exit.                                                |
 
 For every file in the file list a file with the name `<filebasename>_<ext>.txt` is written.
 I.e., the file name is appended changed so that the period of the extension becomes an underscore and is then appended with the `.txt` extension.
 
 If `allchars` is **not** present, only letters and digits are counted.
 
-If `sequential` is not specified, the files are analyzed in overlapping mode.
+If `ignorewhitespace` is specified, white space characters are ignored.
+
+If `sequential` is **not** specified, the files are analyzed in overlapping mode.
 
 If no argument is specified, a usage message is written.
 This usage message contains a list of all supported encodings.
@@ -73,7 +76,7 @@ This usage message contains a list of all supported encodings.
 #### Encoding
 
 The `encoding` option can have a lot of values that represent all the encodings that Go supports.
-They full list is printed, when the program is called with the `help` option. 
+The full list is printed, when the program is called with the `help` option. 
 Here are the most important ones:
 
 | Name        | Meaning                                                          |

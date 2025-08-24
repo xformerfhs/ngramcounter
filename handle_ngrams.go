@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 3.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Correct CSV file error message.
 //    2025-01-19: V1.1.0: Handle empty files correctly.
 //    2025-06-22: V2.0.0: Handle "allChars" option.
+//    2025-08-24: V3.0.0: Handle "ignoreWhiteSpace" option.
 //
 
 package main
@@ -49,6 +50,7 @@ func countNGrams(
 	ngramSize uint,
 	useSequential bool,
 	allChars bool,
+	ignoreWhiteSpace bool,
 ) error {
 	var err error
 	var count map[string]uint64
@@ -64,7 +66,7 @@ func countNGrams(
 
 	logger.PrintInfof(19, `File encoding is '%s'`, requestedEncodingName)
 
-	requestedNgramCounter := counters.NewNgramCounter(requestedEncoding, ngramSize, allChars, useSequential)
+	requestedNgramCounter := counters.NewNgramCounter(requestedEncoding, ngramSize, allChars, useSequential, ignoreWhiteSpace)
 
 	// 2. Loop through files.
 	for _, fileName := range flag.Args() {
@@ -116,7 +118,7 @@ func chooseCounter(
 	if probedEncoding != nil &&
 		probedEncoding != requestedEncoding {
 		logger.PrintInfof(20, `File '%s' has a %s byte order mark and is read with this encoding`, fileName, probedEncodingName)
-		return counters.NewNgramCounter(probedEncoding, ngramSize, allChars, useSequential), nil
+		return counters.NewNgramCounter(probedEncoding, ngramSize, allChars, useSequential, ignoreWhiteSpace), nil
 	}
 
 	return requestedNGramCounter, nil
