@@ -41,6 +41,7 @@
 //    2025-06-23: V3.0.1: Refactored the result writer.
 //    2025-06-25: V3.0.2: Simplified n-gram counter.
 //    2025-08-23: V3.1.0: Recognize UTF-32.
+//    2025-08-24: V3.1.1: Simplified handling of n-gram counter, implement maximum n-gram size.
 //
 
 package main
@@ -55,7 +56,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `3.1.0`
+const myVersion = `3.1.1`
 
 // ******** Formal main function ********
 

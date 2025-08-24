@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.1.0
+// Version: 2.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Simplified sort call.
 //    2025-02-16: V1.1.0: Simplified name normalization.
+//    2025-08-24: V2.0.0: Changed function name to "EncodingForName".
 //
 
 package encodinghelper
@@ -42,8 +43,8 @@ import (
 
 // ******** Public functions ********
 
-// TranslateEncoding translates a character encoding text into an encoding.Encoding.
-func TranslateEncoding(charEncoding string) (encoding.Encoding, string, error) {
+// EncodingForName translates a character encoding text into an encoding.Encoding.
+func EncodingForName(charEncoding string) (encoding.Encoding, string, error) {
 	enc, exists := textToEncoding[normalizeEncoding(charEncoding)]
 	if !exists {
 		return nil, ``, fmt.Errorf(`Invalid character encoding: '%s'`, charEncoding)
@@ -71,7 +72,7 @@ func EncodingTextList() []string {
 func normalizeEncoding(charEncoding string) string {
 	normalizedEncoding := cleanEncodingText(charEncoding)
 
-	// Change "macintoshx" to "macx". No other transformation is needed in this case.
+	// Change "macintosh#" to "mac#". No other transformation is needed in this case.
 	if strings.HasPrefix(normalizedEncoding, `macintosh`) {
 		normalizedEncoding = `mac` + normalizedEncoding[9:]
 		return normalizedEncoding
@@ -79,23 +80,23 @@ func normalizeEncoding(charEncoding string) string {
 
 	// The following cases are mutually exclusive, so they are put into a switch statement.
 	switch {
-	// Remove "ibm" from "ibmcodepage###".
+	// Remove "ibm" from "ibmcodepage#".
 	case strings.HasPrefix(normalizedEncoding, `ibm`):
 		normalizedEncoding = normalizedEncoding[3:]
 
-	// Change "windowsx" to "winx".
+	// Change "windows#" to "win#".
 	case strings.HasPrefix(normalizedEncoding, `windows`):
 		normalizedEncoding = `win` + normalizedEncoding[7:]
 	}
 
-	// The following statements clean up special cases that may are produced by the previous ones.
+	// The following statements clean up special cases that may be produced by the previous ones.
 
-	// Change "wincodepagex" to "codepagex".
+	// Change "wincodepage#" to "codepage#".
 	if strings.HasPrefix(normalizedEncoding, `wincodepage`) {
 		normalizedEncoding = normalizedEncoding[3:]
 	}
 
-	// Change "codepagex" to "cpx".
+	// Change "codepage#" to "cp#".
 	if strings.HasPrefix(normalizedEncoding, `codepage`) {
 		normalizedEncoding = `cp` + normalizedEncoding[8:]
 	}
@@ -103,6 +104,7 @@ func normalizeEncoding(charEncoding string) string {
 	return normalizedEncoding
 }
 
+// cleanBuilder is used to build the clean encoding text.
 var cleanBuilder stringhelper.Builder
 
 // cleanEncodingText converts an encoding specification into all lower-case and removes all separators.

@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.0.0
+// Version: 4.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-06-22: V2.0.0: New option "allchars".
 //    2025-06-23: V3.0.0: Remove option "separator".
+//    2025-08-23: V4.0.0: Check upper limit for "size" option.
 //
 
 package main
@@ -36,12 +37,19 @@ import (
 	"ngramcounter/logger"
 )
 
+// ******** Public constants ********
+
 // Possible return codes.
 const (
 	rcOK              = 0
 	rcCmdLineError    = 1
 	rcProcessingError = 2
 )
+
+// ******** Private constants ********
+
+// maxSize is the maximum size of an n-gram.
+const maxSize = 255
 
 // ******** Private variables ********
 
@@ -70,7 +78,7 @@ func defineCommandLineFlags() {
 
 	flag.BoolVar(&useSequential, `sequential`, false, `Read n-grams in sequential mode`)
 
-	flag.BoolVar(&allChars, `allchars`, false, `Count all UTF-8 characters`)
+	flag.BoolVar(&allChars, `allchars`, false, `Count all UTF-8 characters, not only letters and digits`)
 
 	flag.BoolVar(&useHelp, `help`, false, `Print usage and exit`)
 
@@ -84,6 +92,11 @@ func checkCommandLineFlags() int {
 	if flag.NArg() == 0 {
 		logger.PrintError(21, `File names missing`)
 		printUsage()
+		return rcCmdLineError
+	}
+
+	if ngramSize > maxSize {
+		logger.PrintErrorf(22, `n-gram size '%d' is too large (max=%d)`, ngramSize, maxSize)
 		return rcCmdLineError
 	}
 

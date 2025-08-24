@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.3.0
+// Version: 3.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -29,6 +29,7 @@
 //    2025-01-11: V2.1.0: Simplify preparing next collector state and make it faster.
 //    2025-01-12: V2.2.0: Simplify preparing next collector state.
 //    2025-06-25: V2.3.0: Simplify "CountNGrams" function.
+//    2025-08-24: V3.0.0: Move all parameters to the constructor.
 //
 
 package counters
@@ -52,17 +53,29 @@ import (
 type NgramCounter struct {
 	decoder               *encoding.Decoder
 	onlyLettersAndNumbers bool
+	useSequential         bool
+	ngramSize             uint8
 }
 
 // ******** Public functions ********
 
 // NewNgramCounter returns a new NGramCounter for the given encoding text.
-func NewNgramCounter(enc encoding.Encoding, allChars bool) *NgramCounter {
-	return &NgramCounter{decoder: enc.NewDecoder(), onlyLettersAndNumbers: !allChars}
+func NewNgramCounter(
+	enc encoding.Encoding,
+	ngramSize uint,
+	allChars bool,
+	useSequential bool,
+) *NgramCounter {
+	return &NgramCounter{
+		decoder:               enc.NewDecoder(),
+		ngramSize:             uint8(ngramSize),
+		onlyLettersAndNumbers: !allChars,
+		useSequential:         useSequential,
+	}
 }
 
 // CountNGrams counts the n-grams in the file.
-func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequential bool) (map[string]uint64, uint64, error) {
+func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64, error) {
 	br, file, err := nc.openAndWrapFile(fileName)
 	if err != nil {
 		return nil, 0, err
@@ -70,8 +83,8 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 	defer filehelper.CloseFile(file)
 
 	result := make(map[string]uint64)
-	collector := make([]rune, ngramSize)
-	collectorIndex := uint(0)
+	collector := make([]rune, nc.ngramSize)
+	collectorIndex := uint8(0)
 	ngramCounter := uint64(0)
 
 	for {
@@ -92,15 +105,16 @@ func (nc *NgramCounter) CountNGrams(fileName string, ngramSize uint, useSequenti
 		collector[collectorIndex] = r
 		collectorIndex++
 
-		if collectorIndex == ngramSize {
+		if collectorIndex == nc.ngramSize {
 			ngramCounter++
 			ngram := string(collector)
 			result[ngram]++
-			collectorIndex = prepareCollector(collector, collectorIndex, ngramSize, useSequential)
+			collectorIndex = prepareCollector(collector, collectorIndex, nc.ngramSize, nc.useSequential)
 		}
 	}
 
-	if useSequential && collectorIndex != 0 {
+	if nc.useSequential &&
+		collectorIndex != 0 {
 		return nil, 0, fmt.Errorf(`File ends with a %d-gram`, collectorIndex)
 	}
 
@@ -135,7 +149,11 @@ func (nc *NgramCounter) shouldSkipRune(r rune) bool {
 }
 
 // prepareCollector prepares the collector for the next rune.
-func prepareCollector(collector []rune, collectorIndex uint, ngramSize uint, useSequential bool) uint {
+func prepareCollector(
+	collector []rune,
+	collectorIndex uint8,
+	ngramSize uint8,
+	useSequential bool) uint8 {
 	if useSequential {
 		// Sequential mode reuses the collector from the start.
 		return 0
@@ -146,9 +164,9 @@ func prepareCollector(collector []rune, collectorIndex uint, ngramSize uint, use
 			copy(collector, collector[1:ngramSize])
 		} else {
 			// If there are less than 8 elements, a loop is faster.
-			ngramSize--
-			_ = collector[ngramSize] // Check index of upper limit only once.
-			for i, j := uint(0), uint(1); j <= ngramSize; j++ {
+			_ = collector[ngramSize-1] // Check index of upper limit only once.
+
+			for i, j := uint8(0), uint8(1); j < ngramSize; j++ {
 				collector[i] = collector[j]
 				i = j
 			}

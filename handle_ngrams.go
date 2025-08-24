@@ -46,7 +46,7 @@ import (
 // countNGrams counts n-grams in all specified files.
 func countNGrams(
 	charEncoding string,
-	ngram uint,
+	ngramSize uint,
 	useSequential bool,
 	allChars bool,
 ) error {
@@ -57,20 +57,20 @@ func countNGrams(
 	// 1. Get requested encoding and corresponding n-gram counter.
 	var requestedEncoding encoding.Encoding
 	var requestedEncodingName string
-	requestedEncoding, requestedEncodingName, err = encodinghelper.TranslateEncoding(charEncoding)
+	requestedEncoding, requestedEncodingName, err = encodinghelper.EncodingForName(charEncoding)
 	if err != nil {
 		return err
 	}
 
-	requestedNgramCounter := counters.NewNgramCounter(requestedEncoding, allChars)
-
 	logger.PrintInfof(19, `File encoding is '%s'`, requestedEncodingName)
+
+	requestedNgramCounter := counters.NewNgramCounter(requestedEncoding, ngramSize, allChars, useSequential)
 
 	// 2. Loop through files.
 	for _, fileName := range flag.Args() {
 		printAnalysisInfo(fileName)
 
-		// 3. Check if the current file has a byte-order mark and change counter if it has one.
+		// 3. Check if the current file has a byte-order mark and change the counter if it has one.
 		var actNgramCounter *counters.NgramCounter
 		actNgramCounter, err = chooseCounter(fileName, requestedEncoding, requestedNgramCounter)
 		if err != nil {
@@ -78,7 +78,7 @@ func countNGrams(
 		}
 
 		// 4. Count n-grams.
-		count, total, err = actNgramCounter.CountNGrams(fileName, ngram, useSequential)
+		count, total, err = actNgramCounter.CountNGrams(fileName)
 		if err != nil {
 			return makeCountError(fileName, err)
 		}
@@ -96,7 +96,9 @@ func countNGrams(
 	return nil
 }
 
-// chooseCounter checks if the file has a byte-order-mark and returns the corresponding counter.
+// chooseCounter checks if the file has a byte order mark and returns
+// either the requested n-gram counter or the counter matching the byte order mark
+// if it differs from the requested encoding.
 func chooseCounter(
 	fileName string,
 	requestedEncoding encoding.Encoding,
@@ -113,8 +115,8 @@ func chooseCounter(
 
 	if probedEncoding != nil &&
 		probedEncoding != requestedEncoding {
-		logger.PrintInfof(20, `File '%s' has a %s byte-order mark and is read with this encoding`, fileName, probedEncodingName)
-		return counters.NewNgramCounter(probedEncoding, allChars), nil
+		logger.PrintInfof(20, `File '%s' has a %s byte order mark and is read with this encoding`, fileName, probedEncodingName)
+		return counters.NewNgramCounter(probedEncoding, ngramSize, allChars, useSequential), nil
 	}
 
 	return requestedNGramCounter, nil
