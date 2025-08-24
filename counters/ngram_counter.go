@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.0.0
+// Version: 3.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -30,6 +30,7 @@
 //    2025-01-12: V2.2.0: Simplify preparing next collector state.
 //    2025-06-25: V2.3.0: Simplify "CountNGrams" function.
 //    2025-08-24: V3.0.0: Move all parameters to the constructor.
+//    2025-08-24: V3.1.0: Much less memory consumption because of the AVL tree.
 //
 
 package counters
@@ -39,6 +40,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"ngramcounter/avltreeslicekey"
 	"ngramcounter/filehelper"
 	"os"
 	"unicode"
@@ -82,11 +84,15 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 	}
 	defer filehelper.CloseFile(file)
 
-	result := make(map[string]uint64)
+	// Count the n-grams in an AVL tree so that
+	// no myriads of intermediate strings are created.
+	// Go does not have string de-duplication.
+	countField := new(avltreeslicekey.AVLTree[rune, uint64])
 	collector := make([]rune, nc.ngramSize)
 	collectorIndex := uint8(0)
 	ngramCounter := uint64(0)
 
+	// Read the file character by character.
 	for {
 		var r rune
 		r, _, err = br.ReadRune()
@@ -98,17 +104,22 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 			return nil, 0, err
 		}
 
+		// Skip some characters.
 		if nc.shouldSkipRune(r) {
 			continue
 		}
 
+		// Put the rune into the collector.
 		collector[collectorIndex] = r
 		collectorIndex++
 
+		// Collector is full. Add the n-gram to the count field.
 		if collectorIndex == nc.ngramSize {
 			ngramCounter++
-			ngram := string(collector)
-			result[ngram]++
+
+			countNgram(countField, collector)
+
+			// Set the next collector index.
 			collectorIndex = prepareCollector(collector, collectorIndex, nc.ngramSize, nc.useSequential)
 		}
 	}
@@ -118,7 +129,7 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 		return nil, 0, fmt.Errorf(`File ends with a %d-gram`, collectorIndex)
 	}
 
-	return result, ngramCounter, nil
+	return makeResultMapFromCountField(countField), ngramCounter, nil
 }
 
 // ******** Private functions ********
@@ -148,6 +159,16 @@ func (nc *NgramCounter) shouldSkipRune(r rune) bool {
 	return false
 }
 
+// countNgram counts the n-gram in the count field.
+func countNgram(countField *avltreeslicekey.AVLTree[rune, uint64], collector []rune) {
+	count, found := countField.Search(collector)
+	if found {
+		countField.SetLastFound(count + 1)
+	} else {
+		countField.Insert(collector, 1)
+	}
+}
+
 // prepareCollector prepares the collector for the next rune.
 func prepareCollector(
 	collector []rune,
@@ -174,4 +195,15 @@ func prepareCollector(
 
 		return collectorIndex - 1
 	}
+}
+
+// makeResultMapFromCountField creates the result map from the count field.
+func makeResultMapFromCountField(countField *avltreeslicekey.AVLTree[rune, uint64]) map[string]uint64 {
+	result := make(map[string]uint64)
+	// The strings are only created here so that there are not so many of them.
+	for _, kv := range countField.KeyValuePairs() {
+		result[string(kv.Key)] = kv.Value
+	}
+
+	return result
 }

@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.1.0
+// Version: 3.2.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -42,6 +42,7 @@
 //    2025-06-25: V3.0.2: Simplified n-gram counter.
 //    2025-08-23: V3.1.0: Recognize UTF-32.
 //    2025-08-24: V3.1.1: Simplified handling of n-gram counter, implement maximum n-gram size.
+//    2025-08-24: V3.2.0: Use much less memory when counting n-grams.
 //
 
 package main
@@ -56,7 +57,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `3.1.1`
+const myVersion = `3.2.0`
 
 // ******** Formal main function ********
 
