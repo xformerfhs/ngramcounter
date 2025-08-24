@@ -37,12 +37,13 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/transform"
 	"io"
 	"ngramcounter/filehelper"
 	"os"
 	"unicode"
+
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/transform"
 )
 
 // ******** Public types *********

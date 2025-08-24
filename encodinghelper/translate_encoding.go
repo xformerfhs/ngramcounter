@@ -32,11 +32,12 @@ package encodinghelper
 
 import (
 	"fmt"
-	"golang.org/x/text/encoding"
 	"ngramcounter/maphelper"
 	"ngramcounter/stringhelper"
 	"strings"
 	"unicode"
+
+	"golang.org/x/text/encoding"
 )
 
 // ******** Public functions ********

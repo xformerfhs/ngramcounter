@@ -20,19 +20,23 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.1.0
+// Version: 1.2.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
 //    2025-01-19: V1.1.0: Correct handling of short files.
+//    2025-08-23: V1.2.0: Recognize UTF-32.
 //
 
 package encodinghelper
 
 import (
-	"golang.org/x/text/encoding"
+	"errors"
 	"ngramcounter/filehelper"
 	"os"
+	"strings"
+
+	"golang.org/x/text/encoding"
 )
 
 // ******** Private constants ********
@@ -57,9 +61,9 @@ func ProbeFile(fileName string) (encoding.Encoding, string, error) {
 	}
 	defer filehelper.CloseFile(f)
 
-	// 1. Read the first three bytes.
+	// 1. Read the first four bytes.
 	var readCount int
-	miniBuffer := make([]byte, 3)
+	miniBuffer := make([]byte, 4)
 	readCount, err = f.Read(miniBuffer)
 	if err != nil {
 		return nil, ``, err
@@ -72,30 +76,63 @@ func ProbeFile(fileName string) (encoding.Encoding, string, error) {
 		return nil, ``, nil
 	}
 
-	var ei encodingInfo
-	if miniBuffer[0] == utf16BeBom[0] &&
-		miniBuffer[1] == utf16BeBom[1] {
-		ei = textToEncoding[`utf16be`]
-		return ei.encoding, ei.name, nil
-	}
+	var encodingName string
+	var found bool
+	encodingName, found, err = checkBufferForBom(miniBuffer, readCount)
 
-	if miniBuffer[0] == utf16LeBom[0] &&
-		miniBuffer[1] == utf16LeBom[1] {
-		ei = textToEncoding[`utf16le`]
-		return ei.encoding, ei.name, nil
-	}
+	if found {
+		if strings.HasPrefix(encodingName, `utf32`) {
+			return nil, encodingName, errors.New(`UTF-32 is not supported`)
+		}
 
-	// File has only 2 bytes. There is no UTF-8-BOM.
-	if readCount < 3 {
-		return nil, ``, nil
-	}
-
-	if miniBuffer[0] == utf8Bom[0] &&
-		miniBuffer[1] == utf8Bom[1] &&
-		miniBuffer[2] == utf8Bom[2] {
-		ei = textToEncoding[`utf8`]
-		return ei.encoding, ei.name, nil
+		return textToEncoding[encodingName].encoding, encodingName, nil
 	}
 
 	return nil, ``, nil
+}
+
+// ******** Private functions ********
+
+// checkBufferForBom checks the first four bytes of a buffer for BOMs.
+func checkBufferForBom(buffer []byte, count int) (string, bool, error) {
+	// Suppress unnecessary bounds checks.
+	_ = buffer[3]
+	_ = utf8Bom[2]
+	_ = utf16BeBom[1]
+	_ = utf16LeBom[1]
+
+	switch buffer[0] {
+	case utf8Bom[0]:
+		if count >= 3 &&
+			buffer[1] == utf8Bom[1] &&
+			buffer[2] == utf8Bom[2] {
+			return `utf8`, true, nil
+		}
+
+	case utf16LeBom[0]:
+		if buffer[1] == utf16LeBom[1] {
+			if count >= 4 &&
+				buffer[2] == 0 &&
+				buffer[3] == 0 {
+				return `utf32le`, true, nil
+			}
+
+			return `utf16le`, true, nil
+		}
+
+	case utf16BeBom[0]:
+		if buffer[1] == utf16BeBom[1] {
+			return `utf16be`, true, nil
+		}
+
+	case 0:
+		if count >= 4 &&
+			buffer[1] == 0 &&
+			buffer[2] == utf16BeBom[0] &&
+			buffer[3] == utf16BeBom[1] {
+			return `utf32be`, true, nil
+		}
+	}
+
+	return ``, false, nil
 }

@@ -34,12 +34,13 @@ package main
 import (
 	"errors"
 	"flag"
-	"golang.org/x/text/encoding"
 	"io"
 	"ngramcounter/counters"
 	"ngramcounter/encodinghelper"
 	"ngramcounter/logger"
 	"ngramcounter/resultwriter"
+
+	"golang.org/x/text/encoding"
 )
 
 // countNGrams counts n-grams in all specified files.
@@ -110,7 +111,8 @@ func chooseCounter(
 		return nil, err
 	}
 
-	if probedEncoding != nil && probedEncoding != requestedEncoding {
+	if probedEncoding != nil &&
+		probedEncoding != requestedEncoding {
 		logger.PrintInfof(20, `File '%s' has a %s byte-order mark and is read with this encoding`, fileName, probedEncodingName)
 		return counters.NewNgramCounter(probedEncoding, allChars), nil
 	}
