@@ -104,7 +104,7 @@ func realMain() int {
 	}
 
 	if err != nil {
-		logger.PrintError(16, err.Error())
+		logger.PrintError(15, err.Error())
 		return rcProcessingError
 	}
 
