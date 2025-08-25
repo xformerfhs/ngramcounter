@@ -51,13 +51,14 @@ type KeyValuePair[K cmp.Ordered, V any] struct {
 
 // Insert inserts a new node into the tree.
 func (t *AVLTree[K, V]) Insert(key []K, value V) {
+	newNode := newAVLNode(key, value)
+
 	if t.root == nil {
-		t.root = newAVLNode(key, value)
-		t.count++
-		return
+		t.root = newNode
+	} else {
+		t.root = t.root.insert(newNode)
 	}
 
-	t.root = t.root.insert(newAVLNode(key, value))
 	t.count++
 }
 
