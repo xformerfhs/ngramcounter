@@ -82,11 +82,11 @@ func NewNgramCounter(
 
 // CountNGrams counts the n-grams in the file.
 func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64, error) {
-	br, file, err := nc.openAndWrapFile(fileName)
+	br, f, err := nc.openAndWrapFile(fileName)
 	if err != nil {
 		return nil, 0, err
 	}
-	defer filehelper.CloseFile(file)
+	defer filehelper.CloseFile(f)
 
 	// Count the n-grams in an AVL tree so that
 	// no myriads of intermediate strings are created.
