@@ -117,7 +117,7 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 		collector[collectorIndex] = r
 		collectorIndex++
 
-		// Collector is full. Add the n-gram to the count field.
+		// If the collector is full, add the n-gram to the count field.
 		if collectorIndex == nc.ngramSize {
 			ngramCounter++
 
