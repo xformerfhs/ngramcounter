@@ -42,6 +42,7 @@ type AVLTree[K cmp.Ordered, V any] struct {
 	lastFoundNode *avlNode[K, V]
 }
 
+// KeyValuePair is the structure for a key-value pair.
 type KeyValuePair[K cmp.Ordered, V any] struct {
 	Key   []K
 	Value V
