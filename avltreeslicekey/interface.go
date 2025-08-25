@@ -53,11 +53,12 @@ type KeyValuePair[K cmp.Ordered, V any] struct {
 // Insert inserts a new node into the tree.
 func (t *AVLTree[K, V]) Insert(key []K, value V) {
 	newNode := newAVLNode(key, value)
+	root := t.root
 
-	if t.root == nil {
+	if root == nil {
 		t.root = newNode
 	} else {
-		t.root = t.root.insert(newNode)
+		t.root = root.insert(newNode)
 	}
 
 	t.count++
@@ -96,12 +97,14 @@ func (t *AVLTree[K, V]) Set(key []K, newValue V) bool {
 
 // SetLastFound sets the last found node to the given value.
 func (t *AVLTree[K, V]) SetLastFound(newValue V) bool {
-	if t.lastFoundNode != nil {
-		t.lastFoundNode.Value = newValue
-		return true
+	lastFoundNode := t.lastFoundNode
+	wasFound := lastFoundNode != nil
+
+	if wasFound {
+		lastFoundNode.Value = newValue
 	}
 
-	return false
+	return wasFound
 }
 
 // Keys returns all keys in the tree in sorted order.
