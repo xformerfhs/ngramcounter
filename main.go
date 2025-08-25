@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.0
+// Version: 4.0.1
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -45,6 +45,7 @@
 //    2025-08-24: V3.2.0: Use much less memory when counting n-grams.
 //    2025-08-24: V3.2.1: Correct handling of "size" option.
 //    2025-08-24: V4.0.0: Option to ignore white space characters.
+//    2025-08-25: V4.0.1: Some simplifications in AVLTree.
 //
 
 package main
@@ -59,7 +60,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `4.0.0`
+const myVersion = `4.0.1`
 
 // ******** Formal main function ********
 
