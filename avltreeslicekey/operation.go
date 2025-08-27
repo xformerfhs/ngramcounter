@@ -24,6 +24,7 @@
 //
 // Change history:
 //    2025-08-24: V1.0.0: Created.
+//    2025-08-27: V1.1.0: Use "slices.Compare".
 //
 
 package avltreeslicekey
@@ -63,7 +64,7 @@ func (n *avlNode[K, V]) insert(newNode *avlNode[K, V]) *avlNode[K, V] {
 		return newNode
 	}
 
-	comparison := Compare(newNode.Key, n.Key)
+	comparison := slices.Compare(newNode.Key, n.Key)
 	if comparison < 0 {
 		n.left = n.left.insert(newNode)
 	} else if comparison > 0 {
@@ -80,7 +81,7 @@ func (n *avlNode[K, V]) insert(newNode *avlNode[K, V]) *avlNode[K, V] {
 // search searches for the node with the given key.
 func (n *avlNode[K, V]) search(key []K) *avlNode[K, V] {
 	for current := n; current != nil; {
-		comparison := Compare(key, current.Key)
+		comparison := slices.Compare(key, current.Key)
 
 		if comparison < 0 {
 			current = current.left
