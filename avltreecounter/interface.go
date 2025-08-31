@@ -37,9 +37,8 @@ import (
 
 // AVLTree is a self-balancing binary counter tree with slice keys.
 type AVLTree[K cmp.Ordered] struct {
-	root          *avlNode[K]
-	count         int
-	lastFoundNode *avlNode[K]
+	root  *avlNode[K]
+	count int
 }
 
 // CountEntry is the structure for a count entry.
@@ -68,13 +67,18 @@ func (t *AVLTree[K]) Count() int {
 // Search searches for a node with the given key.
 func (t *AVLTree[K]) Search(key []K) (uint64, bool) {
 	result := t.root.search(key)
-	t.lastFoundNode = result
 
 	if result == nil {
 		return 0, false
 	}
 
 	return result.Count, true
+}
+
+// Clear clears the tree.
+func (t *AVLTree[K]) Clear() {
+	t.root = nil
+	t.count = 0
 }
 
 // Keys returns all keys in the tree in sorted order.
