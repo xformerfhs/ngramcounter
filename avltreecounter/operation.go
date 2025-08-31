@@ -63,19 +63,19 @@ func (n *avlNode[K]) add(key []K) (*avlNode[K], bool) {
 		return newAVLNode(key), true
 	}
 
-	var newNode bool
+	var madeNewNode bool
 	comparison := slices.Compare(key, n.Key)
 	if comparison < 0 {
-		n.left, newNode = n.left.add(key)
+		n.left, madeNewNode = n.left.add(key)
 	} else if comparison > 0 {
-		n.right, newNode = n.right.add(key)
+		n.right, madeNewNode = n.right.add(key)
 	} else {
 		n.Count++
 	}
 
 	n.updateHeight()
 
-	return n.rebalance(), newNode
+	return n.rebalance(), madeNewNode
 }
 
 // search searches for the node with the given key.

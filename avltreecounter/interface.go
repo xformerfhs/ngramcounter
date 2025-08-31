@@ -52,10 +52,10 @@ type CountEntry[K cmp.Ordered] struct {
 
 // Add inserts a new node into the tree.
 func (t *AVLTree[K]) Add(key []K) {
-	var newNode bool
-	t.root, newNode = t.root.add(key)
+	var madeNewNode bool
+	t.root, madeNewNode = t.root.add(key)
 
-	if newNode {
+	if madeNewNode {
 		t.count++
 	}
 }
