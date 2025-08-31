@@ -65,14 +65,15 @@ func (t *AVLTree[K]) Count() int {
 }
 
 // Search searches for a node with the given key.
-func (t *AVLTree[K]) Search(key []K) (uint64, bool) {
+// A result of 0 means that the key was not found.
+func (t *AVLTree[K]) Search(key []K) uint64 {
 	result := t.root.search(key)
 
 	if result == nil {
-		return 0, false
+		return 0
 	}
 
-	return result.Count, true
+	return result.Count
 }
 
 // Clear clears the tree.
