@@ -57,7 +57,7 @@ func newAVLNode[K cmp.Ordered](key []K) *avlNode[K] {
 	}
 }
 
-// add adds the key into the tree.
+// add adds the key to the tree.
 func (n *avlNode[K]) add(key []K) (*avlNode[K], bool) {
 	if n == nil {
 		return newAVLNode(key), true
