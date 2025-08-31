@@ -23,16 +23,16 @@
 // Version: 1.0.0
 //
 // Change history:
-//    2025-08-24: V1.0.0: Created.
+//    2025-08-31: V1.0.0: Created.
 //
 
-package avltreeslicekey
+package avltreecounter
 
 import (
 	"fmt"
 )
 
-func (n *avlNode[K, V]) print(indent string, last bool) {
+func (n *avlNode[K]) print(indent string, last bool) {
 	if n != nil {
 		fmt.Print(indent)
 		if last {
@@ -43,7 +43,7 @@ func (n *avlNode[K, V]) print(indent string, last bool) {
 			indent += "|  "
 		}
 
-		fmt.Printf("%v: %v\n", n.Key, n.Value)
+		fmt.Printf("%v: %v\n", n.Key, n.Count)
 		n.left.print(indent, false)
 		n.right.print(indent, true)
 	}

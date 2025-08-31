@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.0
+// Version: 5.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -32,6 +32,7 @@
 //    2025-08-24: V3.0.0: Move all parameters to the constructor.
 //    2025-08-24: V3.1.0: Much less memory consumption because of the AVL tree.
 //    2025-08-24: V4.0.0: Option to ignore white space characters.
+//    2025-08-31: V5.0.0: Use AVL counter tree.
 //
 
 package counters
@@ -41,7 +42,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"ngramcounter/avltreeslicekey"
+	"ngramcounter/avltreecounter"
 	"ngramcounter/filehelper"
 	"os"
 	"unicode"
@@ -91,7 +92,7 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 	// Count the n-grams in an AVL tree so that
 	// no myriads of intermediate strings are created.
 	// Go does not have string de-duplication.
-	countField := new(avltreeslicekey.AVLTree[rune, uint64])
+	countField := new(avltreecounter.AVLTree[rune])
 	collector := make([]rune, nc.ngramSize)
 	collectorIndex := uint8(0)
 	ngramCounter := uint64(0)
@@ -121,7 +122,7 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 		if collectorIndex == nc.ngramSize {
 			ngramCounter++
 
-			countNgram(countField, collector)
+			countField.Add(collector)
 
 			// Set the next collector index.
 			collectorIndex = prepareCollector(collector, collectorIndex, nc.ngramSize, nc.useSequential)
@@ -167,17 +168,6 @@ func (nc *NgramCounter) shouldSkipRune(r rune) bool {
 	return false
 }
 
-// countNgram counts the n-gram in the count field.
-func countNgram(countField *avltreeslicekey.AVLTree[rune, uint64], collector []rune) {
-	count, found := countField.Search(collector)
-
-	if found {
-		countField.SetLastFound(count + 1)
-	} else {
-		countField.Insert(collector, 1)
-	}
-}
-
 // prepareCollector prepares the collector for the next rune.
 func prepareCollector(
 	collector []rune,
@@ -207,11 +197,11 @@ func prepareCollector(
 }
 
 // makeResultMapFromCountField creates the result map from the count field.
-func makeResultMapFromCountField(countField *avltreeslicekey.AVLTree[rune, uint64]) map[string]uint64 {
+func makeResultMapFromCountField(countField *avltreecounter.AVLTree[rune]) map[string]uint64 {
 	result := make(map[string]uint64)
 	// The strings are only created here so that there are not so many of them.
-	for _, kv := range countField.KeyValuePairs() {
-		result[string(kv.Key)] = kv.Value
+	for _, ce := range countField.CountEntries() {
+		result[string(ce.Key)] = ce.Count
 	}
 
 	return result

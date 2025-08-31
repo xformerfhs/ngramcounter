@@ -23,11 +23,10 @@
 // Version: 1.0.0
 //
 // Change history:
-//    2025-08-24: V1.0.0: Created.
-//    2025-08-27: V1.1.0: Use "slices.Compare".
+//    2025-08-31: V1.0.0: Created.
 //
 
-package avltreeslicekey
+package avltreecounter
 
 import (
 	"cmp"
@@ -36,50 +35,51 @@ import (
 
 // ******** Private types ********
 
-// avlNode is a node in the AVL tree.
-type avlNode[K cmp.Ordered, V any] struct {
+// avlNode is a node in the AVL count tree.
+type avlNode[K cmp.Ordered] struct {
 	Key    []K
-	Value  V
-	left   *avlNode[K, V]
-	right  *avlNode[K, V]
+	Count  uint64
+	left   *avlNode[K]
+	right  *avlNode[K]
 	height int
 }
 
 // ******** Private functions ********
 
 // newAVLNode creates a new AVL node.
-func newAVLNode[K cmp.Ordered, V any](key []K, value V) *avlNode[K, V] {
-	return &avlNode[K, V]{
+func newAVLNode[K cmp.Ordered](key []K) *avlNode[K] {
+	return &avlNode[K]{
 		Key:    slices.Clone(key),
-		Value:  value,
+		Count:  1,
 		left:   nil,
 		right:  nil,
 		height: 0,
 	}
 }
 
-// insert inserts the node into the tree.
-func (n *avlNode[K, V]) insert(newNode *avlNode[K, V]) *avlNode[K, V] {
+// add adds the key into the tree.
+func (n *avlNode[K]) add(key []K) (*avlNode[K], bool) {
 	if n == nil {
-		return newNode
+		return newAVLNode(key), true
 	}
 
-	comparison := slices.Compare(newNode.Key, n.Key)
+	var newNode bool
+	comparison := slices.Compare(key, n.Key)
 	if comparison < 0 {
-		n.left = n.left.insert(newNode)
+		n.left, newNode = n.left.add(key)
 	} else if comparison > 0 {
-		n.right = n.right.insert(newNode)
+		n.right, newNode = n.right.add(key)
 	} else {
-		n.Value = newNode.Value
+		n.Count++
 	}
 
 	n.updateHeight()
 
-	return n.rebalance()
+	return n.rebalance(), newNode
 }
 
 // search searches for the node with the given key.
-func (n *avlNode[K, V]) search(key []K) *avlNode[K, V] {
+func (n *avlNode[K]) search(key []K) *avlNode[K] {
 	for current := n; current != nil; {
 		comparison := slices.Compare(key, current.Key)
 
@@ -97,7 +97,7 @@ func (n *avlNode[K, V]) search(key []K) *avlNode[K, V] {
 }
 
 // collectNodes collects all the nodes in the tree in sorted key order.
-func (n *avlNode[K, V]) collectNodes(nodeCollector []*avlNode[K, V]) []*avlNode[K, V] {
+func (n *avlNode[K]) collectNodes(nodeCollector []*avlNode[K]) []*avlNode[K] {
 	// If the node is nil, return the node collector.
 	if n == nil {
 		return nodeCollector
@@ -122,7 +122,7 @@ func (n *avlNode[K, V]) collectNodes(nodeCollector []*avlNode[K, V]) []*avlNode[
 // ******** Helper functions ********
 
 // balanceFactor calculates the balance factor of the node.
-func (n *avlNode[K, V]) balanceFactor() int {
+func (n *avlNode[K]) balanceFactor() int {
 	left, right := -1, -1
 
 	if n.left != nil {
@@ -137,7 +137,7 @@ func (n *avlNode[K, V]) balanceFactor() int {
 }
 
 // rebalance rebalances the tree.
-func (n *avlNode[K, V]) rebalance() *avlNode[K, V] {
+func (n *avlNode[K]) rebalance() *avlNode[K] {
 	newRoot := n
 	bf := n.balanceFactor()
 
@@ -161,7 +161,7 @@ func (n *avlNode[K, V]) rebalance() *avlNode[K, V] {
 }
 
 // rightRotation rotates the node to the right.
-func (n *avlNode[K, V]) rightRotation() *avlNode[K, V] {
+func (n *avlNode[K]) rightRotation() *avlNode[K] {
 	nl := n.left
 	n.left = nl.right
 	nl.right = n
@@ -173,7 +173,7 @@ func (n *avlNode[K, V]) rightRotation() *avlNode[K, V] {
 }
 
 // leftRotation rotates the node to the left.
-func (n *avlNode[K, V]) leftRotation() *avlNode[K, V] {
+func (n *avlNode[K]) leftRotation() *avlNode[K] {
 	nr := n.right
 	n.right = nr.left
 	nr.left = n
@@ -185,7 +185,7 @@ func (n *avlNode[K, V]) leftRotation() *avlNode[K, V] {
 }
 
 // updateHeight updates the height of the node.
-func (n *avlNode[K, V]) updateHeight() {
+func (n *avlNode[K]) updateHeight() {
 	left, right := -1, -1
 
 	if n.left != nil {

@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.0.2
+// Version: 4.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -47,6 +47,7 @@
 //    2025-08-24: V4.0.0: Option to ignore white space characters.
 //    2025-08-25: V4.0.1: Some simplifications in AVLTree.
 //    2025-08-27: V4.0.2: Use "slices.Compare" in AVLTree.
+//    2025-08-31: V4.1.0: Use AVL tree counter.
 //
 
 package main
@@ -61,7 +62,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `4.0.2`
+const myVersion = `4.1.0`
 
 // ******** Formal main function ********
 
