@@ -84,7 +84,7 @@ func (t *AVLTree[K]) Clear() {
 
 // Keys returns all keys in the tree in sorted order.
 func (t *AVLTree[K]) Keys() [][]K {
-	allNodes := make([]*avlNode[K], 0)
+	allNodes := make([]*avlNode[K], 0, t.count)
 	allNodes = t.root.collectNodes(allNodes)
 	result := make([][]K, len(allNodes))
 
