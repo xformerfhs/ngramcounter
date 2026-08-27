@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2024 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2024-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 5.0.0
+// Version: 5.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -33,6 +33,7 @@
 //    2025-08-24: V3.1.0: Much less memory consumption because of the AVL tree.
 //    2025-08-24: V4.0.0: Option to ignore white space characters.
 //    2025-08-31: V5.0.0: Use AVL counter tree.
+//    2025-08-31: V5.1.0: Simplified collector preparation.
 //
 
 package counters
@@ -177,23 +178,23 @@ func prepareCollector(
 	if useSequential {
 		// Sequential mode reuses the collector from the start.
 		return 0
-	} else {
-		// Overlapped mode copies all elements of the collector one place to the left.
-		if ngramSize >= 8 {
-			// If there are 8 or more elements in the collector, use the copy function.
-			copy(collector, collector[1:ngramSize])
-		} else {
-			// If there are less than 8 elements, a loop is faster.
-			_ = collector[ngramSize-1] // Check index of upper limit only once.
-
-			for i, j := uint8(0), uint8(1); j < ngramSize; j++ {
-				collector[i] = collector[j]
-				i = j
-			}
-		}
-
-		return collectorIndex - 1
 	}
+
+	// Overlapped mode copies all elements of the collector one place to the left.
+	if ngramSize >= 8 {
+		// If there are 8 or more elements in the collector, use the copy function.
+		copy(collector, collector[1:ngramSize])
+	} else {
+		// If there are less than 8 elements, a loop is faster.
+		_ = collector[ngramSize-1] // Check index of upper limit only once.
+
+		for i, j := uint8(0), uint8(1); j < ngramSize; j++ {
+			collector[i] = collector[j]
+			i = j
+		}
+	}
+
+	return collectorIndex - 1
 }
 
 // makeResultMapFromCountField creates the result map from the count field.

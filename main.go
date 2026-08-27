@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2024-2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2024-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -48,6 +48,7 @@
 //    2025-08-25: V4.0.1: Some simplifications in AVLTree.
 //    2025-08-27: V4.0.2: Use "slices.Compare" in AVLTree.
 //    2025-08-31: V4.1.0: Use AVL tree counter.
+//    2026-08-27: V4.2.0: Use "init" correctly and print correct character inclusions.
 //
 
 package main
@@ -62,7 +63,7 @@ import (
 var myName string
 
 // myVersion contains the version number of this executable.
-const myVersion = `4.1.0`
+const myVersion = `4.2.0`
 
 // ******** Formal main function ********
 
@@ -78,7 +79,7 @@ func main() {
 
 // ******** Private functions ********
 
-// realMain is the real main function which obeys defers and sets a return code.
+// realMain is the real main function that obeys defers and sets a return code.
 func realMain() int {
 	defineCommandLineFlags()
 
@@ -98,11 +99,10 @@ func realMain() int {
 		logger.PrintInfo(13, `Counting bytes`)
 		err = countBytes()
 	} else {
-		if ngramSize > 1 {
-			logger.PrintInfof(14, `Counting %d-grams with %s in %s mode`, ngramSize, charsText(), modeText())
-		} else {
-			logger.PrintInfof(14, `Counting %d-grams with %s`, ngramSize, charsText())
-		}
+		logger.PrintInfof(
+			14,
+			`Counting %d-grams with %s in %s mode`,
+			ngramSize, charsText(), modeText())
 
 		err = countNGrams(charEncoding, ngramSize, useSequential, allChars, ignoreWhiteSpace)
 	}
@@ -119,16 +119,20 @@ func realMain() int {
 func modeText() string {
 	if useSequential {
 		return `sequential`
-	} else {
-		return `overlapping`
 	}
+
+	return `overlapping`
 }
 
 // charsText returns the string representation of the allChars flag.
 func charsText() string {
 	if allChars {
-		return `all characters`
-	} else {
-		return `only letters and numbers`
+		if ignoreWhiteSpace {
+			return `all characters excluding whitespace`
+		}
+
+		return `all characters including whitespace`
 	}
+
+	return `only letters and numbers`
 }

@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2025-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,11 +20,12 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.1.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-11: V1.0.1: Improve description of output file name.
+//    2026-08-27: V1.1.0: Added forgotten option to ignore whitespace to usage text.
 //
 
 package main
@@ -63,7 +64,7 @@ func printUsage() {
 
 Usage:`)
 
-	_, _ = fmt.Fprintf(os.Stderr, "\n%s [-size <count>] [-encoding <encoding>] [-allchars] [-sequential] [files...]\n\nwith the following options:\n\n",
+	_, _ = fmt.Fprintf(os.Stderr, "\n%s [-size <count>] [-encoding <encoding>] [-allchars] [-ignorewhitespace] [-sequential] [files...]\n\nwith the following options:\n\n",
 		myName)
 	flag.PrintDefaults()
 

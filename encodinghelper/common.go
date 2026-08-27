@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2024 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2024-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.1.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
+//    2026-08-27: V1.1.0: Use "init" correctly.
 //
 
 package encodinghelper
@@ -55,8 +56,8 @@ var textToEncoding = map[string]encodingInfo{}
 
 // ******** Public functions *********
 
-// InitializeEncoding initializes encoding variables.
-func InitializeEncoding() {
+// init initializes encoding variables.
+func init() {
 	fillEncodingMap()
 }
 

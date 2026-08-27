@@ -29,13 +29,11 @@
 package main
 
 import (
-	"ngramcounter/encodinghelper"
 	"ngramcounter/filehelper"
 	"os"
 )
 
 // init contains calls for the initialization of the package.
 func init() {
-	encodinghelper.InitializeEncoding()
 	myName = filehelper.GetRealBaseName(os.Args[0])
 }

@@ -222,8 +222,7 @@ func writePercentage(f *os.File, count uint64, inverseTotal float64) error {
 	return nil
 }
 
-// percentageTextFromCount builds the percent text from [count] and [inverseTotal]
-// and changes the decimal separator depending on [separator].
+// percentageTextFromCount builds the percent text from [count] and [inverseTotal].
 func percentageTextFromCount(count uint64, inverseTotal float64) string {
 	return fmt.Sprint(float64(count) * inverseTotal * 100)
 }
