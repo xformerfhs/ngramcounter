@@ -61,7 +61,7 @@ import (
 )
 
 // myName contains the name of this executable. It is set in init.
-var myName string = filehelper.GetRealBaseName(os.Args[0])
+var myName = filehelper.GetRealBaseName(os.Args[0])
 
 // myVersion contains the version number of this executable.
 const myVersion = `4.2.0`
