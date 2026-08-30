@@ -60,7 +60,7 @@ import (
 	"runtime"
 )
 
-// myName contains the name of this executable. It is set in init.
+// myName contains the name of this executable.
 var myName = filehelper.GetRealBaseName(os.Args[0])
 
 // myVersion contains the version number of this executable.

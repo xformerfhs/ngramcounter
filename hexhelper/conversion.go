@@ -43,7 +43,7 @@ func ByteToString(b byte) string {
 func buildByteHexTable() []string {
 	result := make([]string, 256)
 
-	for i := 0; i < 256; i++ {
+	for i := range 256 {
 		result[i] = string(byteAsHex(byte(i)))
 	}
 
