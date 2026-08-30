@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2025-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 1.0.1
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
+//    2026-08-30: V1.0.1: Better variable naming.
 //
 
 package avltreecounter
@@ -162,43 +163,43 @@ func (n *avlNode[K]) rebalance() *avlNode[K] {
 
 // rightRotation rotates the node to the right.
 func (n *avlNode[K]) rightRotation() *avlNode[K] {
-	nl := n.left
-	n.left = nl.right
-	nl.right = n
+	leftNode := n.left
+	n.left = leftNode.right
+	leftNode.right = n
 
 	n.updateHeight()
-	nl.updateHeight()
+	leftNode.updateHeight()
 
-	return nl
+	return leftNode
 }
 
 // leftRotation rotates the node to the left.
 func (n *avlNode[K]) leftRotation() *avlNode[K] {
-	nr := n.right
-	n.right = nr.left
-	nr.left = n
+	rightNode := n.right
+	n.right = rightNode.left
+	rightNode.left = n
 
 	n.updateHeight()
-	nr.updateHeight()
+	rightNode.updateHeight()
 
-	return nr
+	return rightNode
 }
 
 // updateHeight updates the height of the node.
 func (n *avlNode[K]) updateHeight() {
-	left, right := -1, -1
+	leftHeight, rightHeight := -1, -1
 
 	if n.left != nil {
-		left = n.left.height
+		leftHeight = n.left.height
 	}
 
 	if n.right != nil {
-		right = n.right.height
+		rightHeight = n.right.height
 	}
 
-	if left > right {
-		n.height = left + 1
+	if leftHeight > rightHeight {
+		n.height = leftHeight + 1
 	} else {
-		n.height = right + 1
+		n.height = rightHeight + 1
 	}
 }
