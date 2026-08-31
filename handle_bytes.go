@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 2.0.1
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Correct CSV file error message.
 //    2025-06-23: V2.0.0: Output text file.
+//    2026-08-31: V2.0.1: Corrected function name.
 //
 
 package main
