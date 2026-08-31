@@ -95,10 +95,9 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 	// Count the n-grams in an AVL tree so that
 	// no myriads of intermediate strings are created.
 	// Go does not have string de-duplication.
-	countField := new(avltreecounter.AVLTree[rune])
+	ngramCounter := new(avltreecounter.AVLTree[rune])
 	collector := make([]rune, nc.ngramSize)
 	collectorIndex := uint8(0)
-	ngramCounter := uint64(0)
 
 	// Read the file character by character.
 	for {
@@ -123,9 +122,7 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 
 		// If the collector is full, add the n-gram to the count field.
 		if collectorIndex == nc.ngramSize {
-			ngramCounter++
-
-			countField.Add(collector)
+			ngramCounter.Add(collector)
 
 			// Set the next collector index.
 			collectorIndex = prepareCollector(collector, collectorIndex, nc.ngramSize, nc.useSequential)
@@ -137,7 +134,7 @@ func (nc *NgramCounter) CountNGrams(fileName string) (map[string]uint64, uint64,
 		return nil, 0, fmt.Errorf(`File ends with a %d-gram`, collectorIndex)
 	}
 
-	return makeResultMapFromCountField(countField), ngramCounter, nil
+	return makeResultMap(ngramCounter), ngramCounter.TotalCount(), nil
 }
 
 // ******** Private functions ********
@@ -199,11 +196,11 @@ func prepareCollector(
 	return collectorIndex - 1
 }
 
-// makeResultMapFromCountField creates the result map from the count field.
-func makeResultMapFromCountField(countField *avltreecounter.AVLTree[rune]) map[string]uint64 {
-	result := make(map[string]uint64, countField.Count())
+// makeResultMap creates the result map from the ngram counter.
+func makeResultMap(ngramCounter *avltreecounter.AVLTree[rune]) map[string]uint64 {
+	result := make(map[string]uint64, ngramCounter.NodeCount())
 	// The strings are only created here so that there are not so many of them.
-	for key, count := range countField.All() {
+	for key, count := range ngramCounter.All() {
 		result[string(key)] = count
 	}
 

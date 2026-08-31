@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.0
+// Version: 3.0.0
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
 //    2026-08-31: V1.1.0: Use the inOrder iterator to build the results.
-//    2026-08-31: V2.0.0: Replaced Keys, CountEntries and CountEntry by the
-//                        allocation-free All iterator.
+//    2026-08-31: V2.0.0: Created "All" iterator.
+//    2026-08-31: V3.0.0: Changed "Search" to "Get", "Count" to "NodeCount" and
+//                        added "TotalCount".
 //
 
 // Package avltreecounter provides a self-balancing binary counter tree with slice keys.
@@ -39,49 +40,56 @@ import (
 
 // ******** Public types ********
 
-// AVLTree is a self-balancing binary counter tree with slice keys.
+// AVLTree is a self-balancing binary search tree that stores
+// a count for each unique key.
 type AVLTree[K cmp.Ordered] struct {
-	root  *avlNode[K]
-	count int
+	root       *avlNode[K]
+	nodeCount  uint64
+	totalCount uint64
 }
 
 // ******** Public functions ********
 
-// Add inserts a new node into the tree.
+// Add adds key to the tree. If key already exists, its count is incremented.
 func (t *AVLTree[K]) Add(key []K) {
 	var madeNewNode bool
 	t.root, madeNewNode = t.root.add(key)
+	t.totalCount++
 
 	if madeNewNode {
-		t.count++
+		t.nodeCount++
 	}
 }
 
-// Count returns the number of nodes in the tree.
-func (t *AVLTree[K]) Count() int {
-	return t.count
+// NodeCount returns the number of nodes in the tree.
+func (t *AVLTree[K]) NodeCount() uint64 {
+	return t.nodeCount
 }
 
-// Search searches for a node with the given key.
-// A result of 0 means that the key was not found.
-func (t *AVLTree[K]) Search(key []K) uint64 {
-	result := t.root.search(key)
+// TotalCount returns the number of keys added to the tree.
+func (t *AVLTree[K]) TotalCount() uint64 {
+	return t.totalCount
+}
+
+// Get searches for a node with the given key.
+func (t *AVLTree[K]) Get(key []K) (uint64, bool) {
+	result := t.root.get(key)
 
 	if result == nil {
-		return 0
+		return 0, false
 	}
 
-	return result.Count
+	return result.Count, true
 }
 
 // Clear clears the tree.
 func (t *AVLTree[K]) Clear() {
 	t.root = nil
-	t.count = 0
+	t.nodeCount = 0
 }
 
 // All returns an iterator over all keys in the tree and their counts,
-// in ascending key order. It allocates nothing.
+// in ascending key order.
 //
 // The yielded key is the tree's own storage and must not be modified,
 // as that would break the sort order of the tree.

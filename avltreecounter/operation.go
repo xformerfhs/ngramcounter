@@ -20,12 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.1.0
+// Version: 1.2.0
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
 //    2026-08-30: V1.0.1: Better variable naming.
 //    2026-08-31: V1.1.0: Replaced collectNodes by the inOrder iterator.
+//    2026-08-31: V1.2.0: Simplified height calculations.
 //
 
 package avltreecounter
@@ -81,8 +82,8 @@ func (n *avlNode[K]) add(key []K) (*avlNode[K], bool) {
 	return n.rebalance(), madeNewNode
 }
 
-// search searches for the node with the given key.
-func (n *avlNode[K]) search(key []K) *avlNode[K] {
+// get searches for the node with the given key.
+func (n *avlNode[K]) get(key []K) *avlNode[K] {
 	for current := n; current != nil; {
 		comparison := slices.Compare(key, current.Key)
 
@@ -112,55 +113,56 @@ func (n *avlNode[K]) inOrder() iter.Seq2[[]K, uint64] {
 // yieldInOrder yields the keys and counts of this subtree in ascending key order.
 // It returns false as soon as the consumer stops the iteration.
 //
-// The recursion needs no heap memory: the AVL invariant bounds the depth
-// to about 1.44*log2(n), so a tree that fills the address space is at most
-// 64 frames deep.
+// The recursion depth is O(log(n)) because the tree is AVL-balanced.
 func (n *avlNode[K]) yieldInOrder(yield func([]K, uint64) bool) bool {
 	if n == nil {
 		return true
 	}
 
 	// Yield the lesser keys, then this key, then the greater keys.
-	return n.left.yieldInOrder(yield) && yield(n.Key, n.Count) && n.right.yieldInOrder(yield)
+	return n.left.yieldInOrder(yield) &&
+		yield(n.Key, n.Count) &&
+		n.right.yieldInOrder(yield)
 }
 
 // balanceFactor calculates the balance factor of the node.
 func (n *avlNode[K]) balanceFactor() int {
-	left, right := -1, -1
+	return height(n.left) - height(n.right)
+}
 
-	if n.left != nil {
-		left = n.left.height
+// updateHeight updates the height of the node.
+func (n *avlNode[K]) updateHeight() {
+	n.height = max(height(n.left), height(n.right)) + 1
+}
+
+// height returns the height of the node.
+func height[K cmp.Ordered](n *avlNode[K]) int {
+	if n == nil {
+		return -1
 	}
 
-	if n.right != nil {
-		right = n.right.height
-	}
-
-	return left - right
+	return n.height
 }
 
 // rebalance rebalances the tree.
 func (n *avlNode[K]) rebalance() *avlNode[K] {
-	newRoot := n
 	bf := n.balanceFactor()
 
 	if bf > 1 {
-		if n.left != nil &&
-			n.left.balanceFactor() < 0 {
+		if n.left.balanceFactor() < 0 {
 			n.left = n.left.leftRotation()
 		}
 
-		newRoot = n.rightRotation()
+		return n.rightRotation()
 	} else if bf < -1 {
-		if n.right != nil &&
-			n.right.balanceFactor() > 0 {
+		if n.right.balanceFactor() > 0 {
 			n.right = n.right.rightRotation()
 		}
 
-		newRoot = n.leftRotation()
+		return n.leftRotation()
 	}
 
-	return newRoot
+	return n
 }
 
 // rightRotation rotates the node to the right.
@@ -185,23 +187,4 @@ func (n *avlNode[K]) leftRotation() *avlNode[K] {
 	rightNode.updateHeight()
 
 	return rightNode
-}
-
-// updateHeight updates the height of the node.
-func (n *avlNode[K]) updateHeight() {
-	leftHeight, rightHeight := -1, -1
-
-	if n.left != nil {
-		leftHeight = n.left.height
-	}
-
-	if n.right != nil {
-		rightHeight = n.right.height
-	}
-
-	if leftHeight > rightHeight {
-		n.height = leftHeight + 1
-	} else {
-		n.height = rightHeight + 1
-	}
 }
