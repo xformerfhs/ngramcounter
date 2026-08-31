@@ -20,17 +20,19 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.1
+// Version: 1.1.0
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
 //    2026-08-30: V1.0.1: Better variable naming.
+//    2026-08-31: V1.1.0: Replaced collectNodes by the inOrder iterator.
 //
 
 package avltreecounter
 
 import (
 	"cmp"
+	"iter"
 	"slices"
 )
 
@@ -97,30 +99,30 @@ func (n *avlNode[K]) search(key []K) *avlNode[K] {
 	return nil
 }
 
-// collectNodes collects all the nodes in the tree in sorted key order.
-func (n *avlNode[K]) collectNodes(nodeCollector []*avlNode[K]) []*avlNode[K] {
-	// If the node is nil, return the node collector.
-	if n == nil {
-		return nodeCollector
+// inOrder returns an iterator over all the keys and counts in the tree
+// in ascending key order.
+func (n *avlNode[K]) inOrder() iter.Seq2[[]K, uint64] {
+	return func(yield func([]K, uint64) bool) {
+		n.yieldInOrder(yield)
 	}
-
-	// Collect the left node, i.e., keys that have lesser values.
-	if n.left != nil {
-		nodeCollector = n.left.collectNodes(nodeCollector)
-	}
-
-	// Add the current node to the node collector.
-	nodeCollector = append(nodeCollector, n)
-
-	// Collect the right node, i.e., keys that have greater values.
-	if n.right != nil {
-		nodeCollector = n.right.collectNodes(nodeCollector)
-	}
-
-	return nodeCollector
 }
 
 // ******** Helper functions ********
+
+// yieldInOrder yields the keys and counts of this subtree in ascending key order.
+// It returns false as soon as the consumer stops the iteration.
+//
+// The recursion needs no heap memory: the AVL invariant bounds the depth
+// to about 1.44*log2(n), so a tree that fills the address space is at most
+// 64 frames deep.
+func (n *avlNode[K]) yieldInOrder(yield func([]K, uint64) bool) bool {
+	if n == nil {
+		return true
+	}
+
+	// Yield the lesser keys, then this key, then the greater keys.
+	return n.left.yieldInOrder(yield) && yield(n.Key, n.Count) && n.right.yieldInOrder(yield)
+}
 
 // balanceFactor calculates the balance factor of the node.
 func (n *avlNode[K]) balanceFactor() int {

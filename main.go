@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.3.0
+// Version: 5.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -50,6 +50,8 @@
 //    2025-08-31: V4.1.0: Use AVL tree counter.
 //    2026-08-27: V4.2.0: Use "init" correctly and print correct character inclusions.
 //    2026-08-31: V4.3.0: Simplified byte counter.
+//    2026-08-31: V4.4.0: Simpler AVLTree interface.
+//    2026-08-31: V5.0.0: The default is to use "sequential" instead of "overlapping".
 //
 
 package main
@@ -65,7 +67,7 @@ import (
 var myName = filehelper.GetRealBaseName(os.Args[0])
 
 // myVersion contains the version number of this executable.
-const myVersion = `4.3.0`
+const myVersion = `5.0.0`
 
 // ******** Formal main function ********
 
@@ -106,7 +108,7 @@ func realMain() int {
 			`Counting %d-grams with %s in %s mode`,
 			ngramSize, charsText(), modeText())
 
-		err = countNGrams(charEncoding, ngramSize, useSequential, allChars, ignoreWhiteSpace)
+		err = countNGrams(charEncoding, ngramSize, !useOverlapping, allChars, ignoreWhiteSpace)
 	}
 
 	if err != nil {
@@ -117,13 +119,13 @@ func realMain() int {
 	return rcOK
 }
 
-// modeText returns the string representation of the useSequential flag.
+// modeText returns the string representation of the useOverlapping flag.
 func modeText() string {
-	if useSequential {
-		return `sequential`
+	if useOverlapping {
+		return `overlapping`
 	}
 
-	return `overlapping`
+	return `sequential`
 }
 
 // charsText returns the string representation of the allChars

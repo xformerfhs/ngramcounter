@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
+## [5.0.0] - 2026-08-31
+
+### Changed
+- Simplified byte counter.
+- Simpler AVLTree interface.
+- The default is to use "sequential" instead of "overlapping".
+
 ## [4.2.0] - 2026-08-27
 
 ### Changed

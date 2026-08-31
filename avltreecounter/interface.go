@@ -20,10 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 2.0.0
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
+//    2026-08-31: V1.1.0: Use the inOrder iterator to build the results.
+//    2026-08-31: V2.0.0: Replaced Keys, CountEntries and CountEntry by the
+//                        allocation-free All iterator.
 //
 
 // Package avltreecounter provides a self-balancing binary counter tree with slice keys.
@@ -31,6 +34,7 @@ package avltreecounter
 
 import (
 	"cmp"
+	"iter"
 )
 
 // ******** Public types ********
@@ -39,12 +43,6 @@ import (
 type AVLTree[K cmp.Ordered] struct {
 	root  *avlNode[K]
 	count int
-}
-
-// CountEntry is the structure for a count entry.
-type CountEntry[K cmp.Ordered] struct {
-	Key   []K
-	Count uint64
 }
 
 // ******** Public functions ********
@@ -82,31 +80,13 @@ func (t *AVLTree[K]) Clear() {
 	t.count = 0
 }
 
-// Keys returns all keys in the tree in sorted order.
-func (t *AVLTree[K]) Keys() [][]K {
-	allNodes := make([]*avlNode[K], 0, t.count)
-	allNodes = t.root.collectNodes(allNodes)
-	result := make([][]K, len(allNodes))
-
-	for i, node := range allNodes {
-		result[i] = node.Key
-	}
-
-	return result
-}
-
-// CountEntries returns all count entries in the tree
-// in sorted order by key.
-func (t *AVLTree[K]) CountEntries() []CountEntry[K] {
-	allNodes := make([]*avlNode[K], 0, t.count)
-	allNodes = t.root.collectNodes(allNodes)
-	result := make([]CountEntry[K], len(allNodes))
-
-	for i, node := range allNodes {
-		result[i] = CountEntry[K]{Key: node.Key, Count: node.Count}
-	}
-
-	return result
+// All returns an iterator over all keys in the tree and their counts,
+// in ascending key order. It allocates nothing.
+//
+// The yielded key is the tree's own storage and must not be modified,
+// as that would break the sort order of the tree.
+func (t *AVLTree[K]) All() iter.Seq2[[]K, uint64] {
+	return t.root.inOrder()
 }
 
 // Dump prints the tree to the console.

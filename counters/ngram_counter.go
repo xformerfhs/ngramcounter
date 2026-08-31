@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 5.1.0
+// Version: 5.2.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -34,6 +34,8 @@
 //    2025-08-24: V4.0.0: Option to ignore white space characters.
 //    2025-08-31: V5.0.0: Use AVL counter tree.
 //    2025-08-31: V5.1.0: Simplified collector preparation.
+//    2026-08-31: V5.2.0: Build the result map from the allocation-free
+//                        AVL tree iterator and presize it.
 //
 
 package counters
@@ -199,10 +201,10 @@ func prepareCollector(
 
 // makeResultMapFromCountField creates the result map from the count field.
 func makeResultMapFromCountField(countField *avltreecounter.AVLTree[rune]) map[string]uint64 {
-	result := make(map[string]uint64)
+	result := make(map[string]uint64, countField.Count())
 	// The strings are only created here so that there are not so many of them.
-	for _, ce := range countField.CountEntries() {
-		result[string(ce.Key)] = ce.Count
+	for key, count := range countField.All() {
+		result[string(key)] = count
 	}
 
 	return result

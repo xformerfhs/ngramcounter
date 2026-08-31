@@ -28,7 +28,7 @@ E.g., when the text `always` is analyzed for 2-grams the modes would produce the
 
 Overlapping mode handles all file lengths, while sequential mode requires that the number of characters in the file is a multiple of the n-gram size. 
 
-Overlapping mode is the default.
+Sequential mode is the default.
 
 ### Encodings
 
@@ -57,7 +57,7 @@ The options have the following meaning:
 | `encoding`         | Character encoding of the source file. Can be any of the list below. |
 | `allchars`         | Count all characters.                                                |
 | `ignorewhitespace` | Ignore white space (Blank, Tab, etc.).                               |
-| `sequential`       | Read n-grams sequentially.                                           |
+| `overlapping`      | Read n-grams in overlapping mode.                                    |
 | `files`            | List of file names whose contents are to be counted.                 |
 | `help`             | Print usage and exit.                                                |
 
@@ -68,7 +68,7 @@ If `allchars` is **not** present, only letters and digits are counted.
 
 If `ignorewhitespace` is specified, white space characters are ignored.
 
-If `sequential` is **not** specified, the files are analyzed in overlapping mode.
+If `overlapping` is **not** specified, the files are analyzed in sequential mode.
 
 If no argument is specified, a usage message is written.
 This usage message contains a list of all supported encodings.

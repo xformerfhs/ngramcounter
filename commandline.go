@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2025 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2025-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 5.0.0
+// Version: 6.0.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
@@ -29,6 +29,7 @@
 //    2025-08-23: V4.0.0: Check upper limit for "size" option.
 //    2025-08-24: V4.0.1: Correct handling of "size" option.
 //    2025-08-24: V5.0.0: New option "ignorewhitespace".
+//    2026-08-31: V6.0.0: Removed option "sequential", added option "overlapping".
 //
 
 package main
@@ -61,8 +62,8 @@ var ngramSize uint
 // charEncoding is the character encoding of the source file.
 var charEncoding string
 
-// useSequential specifies that the n-grams should be read useSequential and not overlapped.
-var useSequential bool
+// useOverlapping specifies that the n-grams should be read useOverlapping and not overlapped.
+var useOverlapping bool
 
 // ignoreWhiteSpace specifies that white space characters should be ignored.
 var ignoreWhiteSpace bool
@@ -81,7 +82,7 @@ func defineCommandLineFlags() {
 
 	flag.StringVar(&charEncoding, `encoding`, encodinghelper.PlatformDefaultEncoding(), `Character encoding for n-grams`)
 
-	flag.BoolVar(&useSequential, `sequential`, false, `Read n-grams in sequential mode`)
+	flag.BoolVar(&useOverlapping, `overlapping`, false, `Read n-grams in overlapping mode`)
 
 	flag.BoolVar(&ignoreWhiteSpace, `ignorewhitespace`, false, `Do not count whitespace characters`)
 
