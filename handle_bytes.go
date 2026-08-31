@@ -20,13 +20,13 @@
 //
 // Author: Frank Schwab
 //
-// Version: 2.0.1
+// Version: 2.1.0
 //
 // Change history:
 //    2025-01-08: V1.0.0: Created.
 //    2025-01-09: V1.0.1: Correct CSV file error message.
 //    2025-06-23: V2.0.0: Output text file.
-//    2026-08-31: V2.0.1: Corrected function name.
+//    2026-08-31: V2.1.0: Simplified counter.
 //
 
 package main
@@ -67,15 +67,20 @@ func countBytes() error {
 // countBytesInFile counts the bytes in the specified file.
 func countBytesInFile(fileName string) (map[string]uint64, uint64, error) {
 	count, total, err := counters.CountBytes(fileName)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	return convertByteMapToStringMap(count), total, err
+	return convertCountsToStringMap(count), total, nil
 }
 
-// convertByteMapToStringMap converts a map from bytes to counts to a map from strings to counts.
-func convertByteMapToStringMap(count map[byte]uint64) map[string]uint64 {
+// convertCountsToStringMap converts counts to a map from strings to counts.
+func convertCountsToStringMap(count []uint64) map[string]uint64 {
 	result := make(map[string]uint64, len(count))
-	for k, v := range count {
-		result[hexhelper.ByteToString(k)] = v
+	for i, c := range count {
+		if c != 0 {
+			result[hexhelper.ByteToString(byte(i))] = c
+		}
 	}
 
 	return result

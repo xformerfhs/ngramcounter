@@ -1,5 +1,5 @@
 //
-// SPDX-FileCopyrightText: Copyright 2024 Frank Schwab
+// SPDX-FileCopyrightText: Copyright 2024-2026 Frank Schwab
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,10 +20,11 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.0.0
+// Version: 2.0.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
+//    2026-08-31: V2.0.0: Return slice instead of map.
 //
 
 package counters
@@ -43,7 +44,7 @@ const bufferSize = 64 * 1024
 // ******** Public functions ********
 
 // CountBytes counts how often a byte appears in a file.
-func CountBytes(fileName string) (map[byte]uint64, uint64, error) {
+func CountBytes(fileName string) ([]uint64, uint64, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, 0, err
@@ -53,7 +54,7 @@ func CountBytes(fileName string) (map[byte]uint64, uint64, error) {
 	buffer := make([]byte, bufferSize)
 
 	total := uint64(0)
-	byteCounter := make(map[byte]uint64, 256)
+	byteCounter := make([]uint64, 256)
 
 	for {
 		var n int

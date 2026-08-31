@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Change history:
 //    2024-03-10: V1.0.0: Created.
@@ -49,6 +49,7 @@
 //    2025-08-27: V4.0.2: Use "slices.Compare" in AVLTree.
 //    2025-08-31: V4.1.0: Use AVL tree counter.
 //    2026-08-27: V4.2.0: Use "init" correctly and print correct character inclusions.
+//    2026-08-31: V4.3.0: Simplified byte counter.
 //
 
 package main
@@ -64,7 +65,7 @@ import (
 var myName = filehelper.GetRealBaseName(os.Args[0])
 
 // myVersion contains the version number of this executable.
-const myVersion = `4.2.0`
+const myVersion = `4.3.0`
 
 // ******** Formal main function ********
 
