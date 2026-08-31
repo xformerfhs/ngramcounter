@@ -52,7 +52,8 @@
 //    2026-08-31: V4.3.0: Simplified byte counter.
 //    2026-08-31: V4.4.0: Simpler AVLTree interface.
 //    2026-08-31: V5.0.0: The default is to use "sequential" instead of "overlapping".
-//    2026-08-31: V5.1.0: Refactored the AVL tree counter..
+//    2026-08-31: V5.1.0: Refactored the AVL tree counter.
+//    2026-08-31: V5.2.0: Made AVL tree Add function faster.
 //
 
 package main
@@ -68,7 +69,7 @@ import (
 var myName = filehelper.GetRealBaseName(os.Args[0])
 
 // myVersion contains the version number of this executable.
-const myVersion = `5.1.0`
+const myVersion = `5.2.0`
 
 // ******** Formal main function ********
 

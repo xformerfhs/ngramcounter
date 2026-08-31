@@ -20,13 +20,14 @@
 //
 // Author: Frank Schwab
 //
-// Version: 1.2.0
+// Version: 1.2.1
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
 //    2026-08-30: V1.0.1: Better variable naming.
 //    2026-08-31: V1.1.0: Replaced collectNodes by the inOrder iterator.
 //    2026-08-31: V1.2.0: Simplified height calculations.
+//    2026-08-31: V1.2.1: Faster addition if node already exists; smaller height data type.
 //
 
 package avltreecounter
@@ -45,7 +46,7 @@ type avlNode[K cmp.Ordered] struct {
 	Count  uint64
 	left   *avlNode[K]
 	right  *avlNode[K]
-	height int
+	height int8 // Even for 2^64 elements the height can never exceed 94.
 }
 
 // ******** Private functions ********
@@ -67,19 +68,25 @@ func (n *avlNode[K]) add(key []K) (*avlNode[K], bool) {
 		return newAVLNode(key), true
 	}
 
-	var madeNewNode bool
+	var addedNewNode bool
 	comparison := slices.Compare(key, n.Key)
 	if comparison < 0 {
-		n.left, madeNewNode = n.left.add(key)
+		n.left, addedNewNode = n.left.add(key)
 	} else if comparison > 0 {
-		n.right, madeNewNode = n.right.add(key)
+		n.right, addedNewNode = n.right.add(key)
 	} else {
+		// Node already exists, no need to update height and rebalance.
 		n.Count++
+		return n, false
 	}
 
-	n.updateHeight()
+	// Only update height and rebalance if a new node was added.
+	if addedNewNode {
+		n.updateHeight()
+		return n.rebalance(), true
+	}
 
-	return n.rebalance(), madeNewNode
+	return n, false
 }
 
 // get searches for the node with the given key.
@@ -126,7 +133,7 @@ func (n *avlNode[K]) yieldInOrder(yield func([]K, uint64) bool) bool {
 }
 
 // balanceFactor calculates the balance factor of the node.
-func (n *avlNode[K]) balanceFactor() int {
+func (n *avlNode[K]) balanceFactor() int8 {
 	return height(n.left) - height(n.right)
 }
 
@@ -136,7 +143,7 @@ func (n *avlNode[K]) updateHeight() {
 }
 
 // height returns the height of the node.
-func height[K cmp.Ordered](n *avlNode[K]) int {
+func height[K cmp.Ordered](n *avlNode[K]) int8 {
 	if n == nil {
 		return -1
 	}
