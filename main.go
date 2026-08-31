@@ -125,7 +125,8 @@ func modeText() string {
 	return `overlapping`
 }
 
-// charsText returns the string representation of the allChars flag.
+// charsText returns the string representation of the allChars
+// and ignoreWhiteSpace flags.
 func charsText() string {
 	if allChars {
 		if ignoreWhiteSpace {
