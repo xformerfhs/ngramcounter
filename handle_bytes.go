@@ -67,11 +67,11 @@ func countBytes() error {
 func countBytesInFile(fileName string) (map[string]uint64, uint64, error) {
 	count, total, err := counters.CountBytes(fileName)
 
-	return convertByteMapToString(count), total, err
+	return convertByteMapToStringMap(count), total, err
 }
 
-// convertByteMapToString converts a map from bytes to counts to a map from strings to counts.
-func convertByteMapToString(count map[byte]uint64) map[string]uint64 {
+// convertByteMapToStringMap converts a map from bytes to counts to a map from strings to counts.
+func convertByteMapToStringMap(count map[byte]uint64) map[string]uint64 {
 	result := make(map[string]uint64, len(count))
 	for k, v := range count {
 		result[hexhelper.ByteToString(k)] = v
