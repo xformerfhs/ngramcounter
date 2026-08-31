@@ -8,12 +8,12 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [5.1.0] - 2026-08-31
 
-### Change
+### Changed
 - Refactored the AVL tree counter.
 
 ## [5.0.0] - 2026-08-31
 
-### Change
+### Changed
 - Simplified byte counter.
 - Simpler AVLTree interface.
 - The default is to use "sequential" instead of "overlapping".
