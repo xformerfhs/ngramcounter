@@ -86,6 +86,7 @@ func (t *AVLTree[K]) Get(key []K) (uint64, bool) {
 func (t *AVLTree[K]) Clear() {
 	t.root = nil
 	t.nodeCount = 0
+	t.totalCount = 0
 }
 
 // All returns an iterator over all keys in the tree and their counts,
