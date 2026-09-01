@@ -20,7 +20,7 @@
 //
 // Author: Frank Schwab
 //
-// Version: 3.0.0
+// Version: 4.0.0
 //
 // Change history:
 //    2025-08-31: V1.0.0: Created.
@@ -28,6 +28,7 @@
 //    2026-08-31: V2.0.0: Created "All" iterator.
 //    2026-08-31: V3.0.0: Changed "Search" to "Get", "Count" to "NodeCount" and
 //                        added "TotalCount".
+//    2026-09-01: V4.0.0: Get returns only the count of a key.
 //
 
 // Package avltreecounter provides a self-balancing binary counter tree with slice keys.
@@ -71,15 +72,17 @@ func (t *AVLTree[K]) TotalCount() uint64 {
 	return t.totalCount
 }
 
-// Get searches for a node with the given key.
-func (t *AVLTree[K]) Get(key []K) (uint64, bool) {
+// Get searches for a node with the given key and returns its count.
+// If the key is not found, 0 is returned. If a key is present
+// in the tree, its count is at least 1.
+func (t *AVLTree[K]) Get(key []K) uint64 {
 	result := t.root.get(key)
 
 	if result == nil {
-		return 0, false
+		return 0
 	}
 
-	return result.Count, true
+	return result.Count
 }
 
 // Clear clears the tree.
