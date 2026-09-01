@@ -625,8 +625,12 @@ func ascendingNumbers(count int) []int {
 
 // descendingNumbers returns the numbers from 0 to count-1 in descending order.
 func descendingNumbers(count int) []int {
-	result := ascendingNumbers(count)
-	slices.Reverse(result)
+	result := make([]int, count)
+	j := count - 1
+	for i := range result {
+		result[i] = j
+		j--
+	}
 
 	return result
 }
@@ -635,7 +639,7 @@ func descendingNumbers(count int) []int {
 func shuffledNumbers(count int) []int {
 	result := ascendingNumbers(count)
 
-	rng := rand.New(rand.NewPCG(0x1234_5678, 0x9abc_def0))
+	rng := rand.New(rand.NewPCG(0x3141_5926, 0x2718_2818))
 	rng.Shuffle(len(result), func(i, j int) {
 		result[i], result[j] = result[j], result[i]
 	})
@@ -669,7 +673,7 @@ func parseKey(t *testing.T, key string) []int {
 	return result
 }
 
-// sortedKeys returns the keys of the map in ascending order,
+// sortedKeys returns the keys of the map in ascending order
 // so that the tests are reproducible.
 func sortedKeys(m map[string]uint64) []string {
 	result := make([]string, 0, len(m))
